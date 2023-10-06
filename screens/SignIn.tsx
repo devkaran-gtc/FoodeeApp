@@ -6,9 +6,11 @@ import {
   View,
   TextInput,
   ToastAndroid,
+  Pressable,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import TopBackNavigation from '../components/TopBackNavigation';
+import {CommonActions} from '@react-navigation/native';
 
 const SignIn = ({navigation}: any) => {
   const [username, setUsername] = useState('');
@@ -35,7 +37,19 @@ const SignIn = ({navigation}: any) => {
             userData.password === password
           ) {
             await AsyncStorage.setItem('userIsSignedIn', 'true');
-            navigation.navigate('HomePageScreen');
+
+            navigation.dispatch(
+              CommonActions.reset({
+                index: 0,
+                routes: [
+                  {
+                    name: 'HomePageScreen',
+                  },
+                ],
+              }),
+            );
+            // navigation.navigate('HomePageScreen');
+            
             setUsername('');
             setPassword('');
           } else {
@@ -64,7 +78,9 @@ const SignIn = ({navigation}: any) => {
 
   return (
     <View style={styles.container}>
-      <TopBackNavigation />
+      <View style={{marginHorizontal: 15, marginTop: 45, position: 'absolute'}}>
+        <TopBackNavigation />
+      </View>
       <View style={styles.innerContainer}>
         <Text style={styles.title}>Sign In</Text>
 
@@ -88,7 +104,12 @@ const SignIn = ({navigation}: any) => {
           <Text style={styles.signInText}>Sign In</Text>
         </TouchableOpacity>
 
-        <Text style={styles.forgotPass}>Forgot Password?</Text>
+        <Pressable
+          onPress={() => {
+            navigation.navigate('ForgotPassword');
+          }}>
+          <Text style={styles.forgotPass}>Forgot Password?</Text>
+        </Pressable>
       </View>
     </View>
   );

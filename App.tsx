@@ -9,6 +9,9 @@ import SignIn from './screens/SignIn';
 import HomePage from './screens/HomePage';
 import FoodInfo from './screens/FoodInfo';
 import Cart from './screens/Cart';
+import ForgotPassword from './screens/ForgotPassword';
+import OnBoard from './screens/OnBoard';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export type RootStackParam = {
   FirstScreen: any;
@@ -17,6 +20,8 @@ export type RootStackParam = {
   HomePageScreen: any;
   FoodInfo: any;
   Cart: any;
+  ForgotPassword: any;
+  OnBoard: any;
 };
 
 const RootStack = createNativeStackNavigator<RootStackParam>();
@@ -36,21 +41,28 @@ function LoadingIndicator() {
 
 function App() {
   const [initialRoute, setInitialRoute] =
-    useState<keyof RootStackParam>('FirstScreen');
+    useState<keyof RootStackParam>('OnBoard');
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const checkSignInStatus = async () => {
-      const userIsSignedIn = await checkIfUserIsSignedIn();
+    const checkIfOnboardingSeen = async () => {
+      const hasSeenOnboarding = await AsyncStorage.getItem('hasSeenOnboarding');
 
-      if (userIsSignedIn) {
-        setInitialRoute('HomePageScreen');
+      if (hasSeenOnboarding) {
+        const userIsSignedIn = await checkIfUserIsSignedIn();
+        if (userIsSignedIn) {
+          setInitialRoute('HomePageScreen');
+        } else {
+          setInitialRoute('FirstScreen');
+        }
+      } else {
+        await AsyncStorage.setItem('hasSeenOnboarding', 'true');
       }
 
       setIsLoading(false);
     };
 
-    checkSignInStatus();
+    checkIfOnboardingSeen();
   }, []);
 
   if (isLoading) {
@@ -69,12 +81,14 @@ function App() {
         screenOptions={{
           headerShown: false,
         }}>
+        <RootStack.Screen name="OnBoard" component={OnBoard} />
         <RootStack.Screen name="FirstScreen" component={First} />
         <RootStack.Screen name="SignUpScreen" component={SignUp} />
         <RootStack.Screen name="SignInScreen" component={SignIn} />
         <RootStack.Screen name="HomePageScreen" component={HomePage} />
         <RootStack.Screen name="FoodInfo" component={FoodInfo} />
         <RootStack.Screen name="Cart" component={Cart} />
+        <RootStack.Screen name="ForgotPassword" component={ForgotPassword} />
       </RootStack.Navigator>
     </NavigationContainer>
   );

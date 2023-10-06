@@ -5,7 +5,8 @@ import {
   TouchableOpacity,
   View,
   TextInput,
-  ToastAndroid
+  ToastAndroid,
+  KeyboardAvoidingView,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import TopBackNavigation from '../components/TopBackNavigation';
@@ -13,38 +14,76 @@ import TopBackNavigation from '../components/TopBackNavigation';
 const SignUp = ({navigation}: any) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [reEnteredPassword, setReEnteredPassword] = useState('');
+  const [email, setEmail] = useState('');
+  const [mobileNo, setmobileNo] = useState('');
 
   const saveUserData = async () => {
-    try {
-      if (!username || !password) {
-        ToastAndroid.showWithGravityAndOffset(
-          'Enter Username && Password',
-          ToastAndroid.SHORT,
-          ToastAndroid.BOTTOM,
-          25,
-          50,
-        );
-        return;
-      }
-      const userData = {
-        username: username,
-        password: password,
-      };
-
-      const userDataJSON = JSON.stringify(userData);
-
-      await AsyncStorage.setItem('userData', userDataJSON);
-
-      console.log('User data saved successfully.');
-      navigation.navigate('SignInScreen');
-    } catch (error) {
-      console.error('Error saving user data:', error);
+    if (!username || !password || !mobileNo || !reEnteredPassword || !email) {
+      ToastAndroid.showWithGravityAndOffset(
+        'Fields are empty',
+        ToastAndroid.SHORT,
+        ToastAndroid.BOTTOM,
+        25,
+        50,
+      );
+      return;
     }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      ToastAndroid.showWithGravityAndOffset(
+        'Invalid email format',
+        ToastAndroid.SHORT,
+        ToastAndroid.BOTTOM,
+        25,
+        50,
+      );
+      return;
+    }
+
+    if (password !== reEnteredPassword) {
+      ToastAndroid.showWithGravityAndOffset(
+        'Passwords do not match',
+        ToastAndroid.SHORT,
+        ToastAndroid.BOTTOM,
+        25,
+        50,
+      );
+      return;
+    }
+
+    if (password.length < 6) {
+      ToastAndroid.showWithGravityAndOffset(
+        'Password must be at least 6 characters long',
+        ToastAndroid.SHORT,
+        ToastAndroid.BOTTOM,
+        25,
+        50,
+      );
+      return;
+    }
+
+    const userData = {
+      username: username,
+      password: password,
+      email: email,
+      mobileNo: mobileNo,
+    };
+
+    const userDataJSON = JSON.stringify(userData);
+
+    await AsyncStorage.setItem('userData', userDataJSON);
+
+    console.log('User data saved successfully.');
+    navigation.navigate('SignInScreen');
   };
 
   return (
     <View style={styles.container}>
-      <TopBackNavigation />
+      <View style={{marginHorizontal: 15, marginTop: 45, position: 'absolute'}}>
+        <TopBackNavigation />
+      </View>
 
       <View style={styles.innerContainer}>
         <Text style={styles.title}>Sign Up</Text>
@@ -56,6 +95,23 @@ const SignUp = ({navigation}: any) => {
           value={username}
           onChangeText={text => setUsername(text)}
         />
+
+        <TextInput
+          style={styles.input}
+          placeholder="Enter Email"
+          placeholderTextColor="#00000080"
+          value={email}
+          inputMode="email"
+          onChangeText={text => setEmail(text)}
+        />
+        <TextInput
+          style={styles.input}
+          placeholder="Enter Mobile No"
+          placeholderTextColor="#00000080"
+          value={mobileNo}
+          inputMode="numeric"
+          onChangeText={text => setmobileNo(text)}
+        />
         <TextInput
           style={styles.input}
           placeholder="Enter Password"
@@ -64,12 +120,19 @@ const SignUp = ({navigation}: any) => {
           value={password}
           onChangeText={text => setPassword(text)}
         />
+        <TextInput
+          style={styles.input}
+          placeholder="Re-Enter Password"
+          placeholderTextColor="#00000080"
+          secureTextEntry={true}
+          value={reEnteredPassword}
+          onChangeText={text => setReEnteredPassword(text)}
+        />
 
         <TouchableOpacity style={styles.signUpBtn} onPress={saveUserData}>
           <Text style={styles.signUpText}>Sign Up</Text>
         </TouchableOpacity>
 
-        <Text style={styles.forgotPass}>Forgot Password?</Text>
       </View>
     </View>
   );
@@ -81,9 +144,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
   },
   innerContainer: {
-    flex: 1,
     marginHorizontal: 30,
-    justifyContent: 'center',
+    marginTop:140,
   },
   title: {
     fontSize: 24,

@@ -6,14 +6,20 @@ import {
   TextInput,
   TouchableOpacity,
   Pressable,
+  Dimensions,
 } from 'react-native';
+
 
 interface Props {
   backgroundColor: string;
   imgSource: any;
 }
 
+const { width } = Dimensions.get('window');
+
+
 const Card = ({backgroundColor, imgSource}: Props) => {
+
   return (
     <Pressable style={[styles.CardContainer, {backgroundColor}]}>
       <View style={styles.InnerContainer}>
@@ -33,7 +39,6 @@ const styles = StyleSheet.create({
   CardContainer: {
     borderRadius: 28,
     paddingVertical: 12,
-
     paddingStart: 20,
     paddingEnd: 12,
     flexDirection: 'row',
