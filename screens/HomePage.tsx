@@ -1,11 +1,5 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 
-import {
-  NavigationContainer,
-  NavigatorScreenParams,
-} from '@react-navigation/native';
-
-import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {useIsFocused} from '@react-navigation/native';
 
@@ -39,19 +33,31 @@ function HomePage() {
           height: 92,
           borderRadius: 28,
           marginHorizontal: 10,
-          marginBottom:10,
-          alignItems:"center",
-          justifyContent:"center",
+          marginBottom: 10,
+          alignItems: 'center',
+          justifyContent: 'center',
           elevation: 10,
-          position:"absolute",
+          position: 'absolute',
         },
-        tabBarIconStyle:{
-          marginTop:15,
+        tabBarIconStyle: {
+          marginTop: 15,
         },
-        tabBarLabelStyle:{
-          marginBottom:20,
+        tabBarLabelStyle: {
+          marginBottom: 20,
         },
       }}>
+      <RootStack.Screen
+        name="Home"
+        component={Home}
+        options={{
+          tabBarIcon: ({color, size}) => {
+            const isFocused = useIsFocused();
+            return <HomeIcon color={color} size={size} focused={isFocused} />;
+          },
+          tabBarLabel: 'Home',
+        }}
+      />
+
       <RootStack.Screen
         name="Location"
         component={Location}
@@ -66,17 +72,6 @@ function HomePage() {
         }}
       />
 
-      <RootStack.Screen
-        name="Home"
-        component={Home}
-        options={{
-          tabBarIcon: ({color, size}) => {
-            const isFocused = useIsFocused();
-            return <HomeIcon color={color} size={size} focused={isFocused} />;
-          },
-          tabBarLabel: 'Home',
-        }}
-      />
       <RootStack.Screen
         name="MyCart"
         component={MyCart}

@@ -1,10 +1,37 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import {Pressable, StyleSheet, Text, View, Image} from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {CommonActions} from '@react-navigation/native';
-import TopBackNavigation from '../components/TopBackNavigation';
+import ProfileMenuItem from '../components/ProfileMenuItem';
+import Button from '../components/Button';
+import SimpleHeader from '../components/SimpleHeader';
+import {useFocusEffect} from '@react-navigation/native';
 
 const Profile = ({navigation}: any) => {
+  const [username, setUsername] = useState('');
+  const [mobileNo, setmobileNo] = useState('');
+  const [profileImg, setProfileImg] = useState('');
+
+  const fetchCardData = () => {
+    AsyncStorage.getItem('userData')
+      .then(cardItemsJson => {
+        if (cardItemsJson) {
+          const parsedCartItems = JSON.parse(cardItemsJson);
+          setProfileImg(parsedCartItems.img);
+          setUsername(parsedCartItems.username);
+          setmobileNo(parsedCartItems.mobileNo);
+        }
+      })
+      .catch(error => {
+        console.error('Error loading card data:', error);
+      });
+  };
+
+  useFocusEffect(
+    React.useCallback(() => {
+      fetchCardData();
+    }, []),
+  );
   const signOut = async () => {
     await AsyncStorage.removeItem('userIsSignedIn');
 
@@ -18,47 +45,28 @@ const Profile = ({navigation}: any) => {
         ],
       }),
     );
-
-    // navigation.navigate('SignInScreen');
   };
 
   return (
-    <View style={{flex: 1}}>
-      <View
-        style={{
-          flexDirection: 'row',
-          marginHorizontal: 15,
-          marginTop: 45,
-          position: 'absolute',
-        }}>
-        <TopBackNavigation />
-      </View>
-
-      <View
-        style={{
-          justifyContent: 'center',
-          alignItems: 'center',
-          marginHorizontal: 15,
-          marginTop: 51,
-        }}>
-        <Text
-          style={{
-            fontFamily: 'Poppins-Regular',
-            fontSize: 18,
-            lineHeight: 27,
-            fontWeight: '700',
-            color: 'black',
-          }}>
-          Profile
-        </Text>
-      </View>
+    <View style={styles.container}>
+      <SimpleHeader title="Profile" />
 
       <View style={{alignItems: 'center', marginTop: 25}}>
-        <Image
-          resizeMode="contain"
-          style={styles.imgContainer}
-          source={require('../assets/images/profile.png')}
-        />
+        <Pressable
+          onPress={() => {
+            navigation.navigate('MyProfile');
+          }}>
+          <Image
+            resizeMode="contain"
+            style={styles.imgContainer}
+            source={
+              profileImg
+                ? {uri: profileImg}
+                : require('../assets/images/profile.png')
+            }
+          />
+        </Pressable>
+
         <Text
           style={{
             marginTop: 20,
@@ -68,7 +76,7 @@ const Profile = ({navigation}: any) => {
             fontWeight: '700',
             color: 'black',
           }}>
-          name
+          {username}
         </Text>
         <Text
           style={{
@@ -79,8 +87,62 @@ const Profile = ({navigation}: any) => {
             fontWeight: '400',
             color: 'black',
           }}>
-          9023812604
+          {mobileNo}
         </Text>
+      </View>
+
+      <View style={{marginTop: 25, marginHorizontal: 20}}>
+        <ProfileMenuItem
+          title="My Profile"
+          onPress={() => {
+            navigation.navigate('MyProfile');
+          }}
+        />
+        <ProfileMenuItem
+          title="Change Password"
+          onPress={() => {
+            navigation.navigate('ForgotPassword', {fromProfile: true});
+          }}
+        />
+        <ProfileMenuItem
+          title="Payment Settings"
+          onPress={() => {
+            navigation.navigate('PaymentSettings');
+          }}
+        />
+        <ProfileMenuItem
+          title="My Voucher"
+          onPress={() => {
+            navigation.navigate('MyVoucher');
+          }}
+        />
+        <ProfileMenuItem
+          title="Notification"
+          onPress={() => {
+            navigation.navigate('Notification');
+          }}
+        />
+        <ProfileMenuItem
+          title="About us"
+          onPress={() => {
+            navigation.navigate('AboutUs');
+          }}
+        />
+        <ProfileMenuItem
+          title="Contact Us"
+          onPress={() => {
+            navigation.navigate('ContactUs');
+          }}
+        />
+      </View>
+
+      <View style={{marginTop: 15, marginHorizontal: 30}}>
+        <Button
+          color="#F5CAC3"
+          text="Sign Out"
+          textColor="black"
+          onPress={signOut}
+        />
       </View>
     </View>
   );
@@ -95,34 +157,6 @@ const styles = StyleSheet.create({
     height: 150,
     width: 150,
     borderRadius: 150 / 2,
-  },
-  title: {
-    fontSize: 14,
-    color: '#34495E',
-    fontWeight: '400',
-    fontFamily: 'Poppins-Regular',
-    marginBottom: 20,
-  },
-  input: {
-    marginBottom: 22,
-    backgroundColor: '#ECF0F1',
-    borderRadius: 30,
-    paddingStart: 30,
-    paddingVertical: 13,
-    color: '#000000',
-    fontSize: 14,
-  },
-  saveBtn: {
-    marginTop: 275,
-    backgroundColor: '#F28482',
-    borderRadius: 30,
-  },
-  saveText: {
-    color: '#fff',
-    textAlign: 'center',
-    fontSize: 18,
-    paddingVertical: 13,
-    fontWeight: '700',
   },
 });
 

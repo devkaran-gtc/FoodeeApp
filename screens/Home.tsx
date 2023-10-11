@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   Text,
   StyleSheet,
@@ -15,8 +15,16 @@ import FilterIcon from '../assets/icons/FilterIcon';
 import Card from '../components/Card';
 import CategoryCard from '../components/CategoryCard';
 import BestOffersCard from '../components/BestOffersCard';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useFocusEffect } from '@react-navigation/native';
 
 const Home = ({navigation}: any) => {
+  const [username, setUsername] = useState('');
+  const [mobileNo, setmobileNo] = useState('');
+  const [profileImg, setProfileImg] = useState('');
+
+  
+
   const menuItems = [
     {
       backgroundColor: '#81B29A',
@@ -124,18 +132,47 @@ const Home = ({navigation}: any) => {
     },
   ];
 
+  const fetchCardData = () => {
+    AsyncStorage.getItem('userData')
+      .then(cardItemsJson => {
+        if (cardItemsJson) {
+          const parsedCartItems = JSON.parse(cardItemsJson);
+          setProfileImg(parsedCartItems.img);
+          setUsername(parsedCartItems.username);          
+          setmobileNo(parsedCartItems.mobileNo);          
+        }
+      })
+      .catch(error => {
+        console.error('Error loading card data:', error);
+      });
+  };
+
+  useFocusEffect(
+    React.useCallback(() => {
+      fetchCardData();
+    }, [])
+  );
+
   return (
     <View style={styles.container}>
-      <Pressable style={styles.greetCard} onPress={()=>{navigation.navigate('Profile');}}>
+      <Pressable
+        style={styles.greetCard}
+        onPress={() => {
+          navigation.navigate('Profile');
+        }}>
         <Image
           resizeMode="contain"
           style={{height: 64, width: 64, borderRadius: 32}}
-          source={require('../assets/images/profile.png')}
+          source={
+            profileImg
+              ? {uri: profileImg}
+              : require('../assets/images/profile.png')
+          }
         />
         <Text style={styles.greetText}>
-          Welcome back, Pin!
+          {username}
           {'\n'}
-          How Hungry are you?
+          {mobileNo}
         </Text>
       </Pressable>
       <View style={styles.searchContainer}>
@@ -207,18 +244,6 @@ const Home = ({navigation}: any) => {
         <Text style={styles.title2}>Best Offers 💕</Text>
 
         <View style={styles.OffersCardContainer}>
-          {/* <FlatList
-            data={bestOffers}
-            keyExtractor={(item, index) => index.toString()}
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={{paddingStart: 20}}
-            renderItem={({item}) => (
-              <BestOffersCard
-                backgroundColor={item.backgroundColor}
-                imgSource={item.imgSource}
-              />
-            )}
-          /> */}
           {bestOffers.map((item, index) => (
             <BestOffersCard
               key={index.toString()}
@@ -276,7 +301,7 @@ const styles = StyleSheet.create({
     marginEnd: 12,
   },
   input: {
-    flex:1,
+    flex: 1,
     marginStart: 6,
     fontFamily: 'Abel-Regular',
     fontSize: 14,
@@ -310,9 +335,9 @@ const styles = StyleSheet.create({
 
   OffersCardContainer: {
     marginTop: 16,
-    justifyContent:'center',
-    alignItems:"center",
-    marginHorizontal:20,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginHorizontal: 20,
   },
   vScroll: {
     paddingStart: 20,

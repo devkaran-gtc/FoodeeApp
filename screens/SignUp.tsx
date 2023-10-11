@@ -6,10 +6,12 @@ import {
   View,
   TextInput,
   ToastAndroid,
-  KeyboardAvoidingView,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import TopBackNavigation from '../components/TopBackNavigation';
+import Button from '../components/Button';
+import {CommonActions} from '@react-navigation/native';
+import {showToast} from '../components/Toast';
 
 const SignUp = ({navigation}: any) => {
   const [username, setUsername] = useState('');
@@ -19,64 +21,40 @@ const SignUp = ({navigation}: any) => {
   const [mobileNo, setmobileNo] = useState('');
 
   const saveUserData = async () => {
-    if (!username || !password || !mobileNo || !reEnteredPassword || !email) {
-      ToastAndroid.showWithGravityAndOffset(
-        'Fields are empty',
-        ToastAndroid.SHORT,
-        ToastAndroid.BOTTOM,
-        25,
-        50,
-      );
-      return;
-    }
-
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      ToastAndroid.showWithGravityAndOffset(
-        'Invalid email format',
-        ToastAndroid.SHORT,
-        ToastAndroid.BOTTOM,
-        25,
-        50,
+
+    if (!username || !password || !mobileNo || !reEnteredPassword || !email) {
+      showToast('Fields are empty');
+    } else if (!emailRegex.test(email)) {
+      showToast('Invalid email format');
+    } else if (password !== reEnteredPassword) {
+      showToast('passwords do not match');
+    } else if (password.length < 6) {
+      showToast('Password must be at least 6 characters long');
+    } else {
+      const userData = {
+        username: username,
+        password: password,
+        email: email,
+        mobileNo: mobileNo,
+      };
+
+      const userDataJSON = JSON.stringify(userData);
+
+      await AsyncStorage.setItem('userData', userDataJSON);
+
+      console.log('User data saved successfully.');
+      navigation.dispatch(
+        CommonActions.reset({
+          index: 0,
+          routes: [
+            {
+              name: 'HomePageScreen',
+            },
+          ],
+        }),
       );
-      return;
     }
-
-    if (password !== reEnteredPassword) {
-      ToastAndroid.showWithGravityAndOffset(
-        'Passwords do not match',
-        ToastAndroid.SHORT,
-        ToastAndroid.BOTTOM,
-        25,
-        50,
-      );
-      return;
-    }
-
-    if (password.length < 6) {
-      ToastAndroid.showWithGravityAndOffset(
-        'Password must be at least 6 characters long',
-        ToastAndroid.SHORT,
-        ToastAndroid.BOTTOM,
-        25,
-        50,
-      );
-      return;
-    }
-
-    const userData = {
-      username: username,
-      password: password,
-      email: email,
-      mobileNo: mobileNo,
-    };
-
-    const userDataJSON = JSON.stringify(userData);
-
-    await AsyncStorage.setItem('userData', userDataJSON);
-
-    console.log('User data saved successfully.');
-    navigation.navigate('SignInScreen');
   };
 
   return (
@@ -110,6 +88,7 @@ const SignUp = ({navigation}: any) => {
           placeholderTextColor="#00000080"
           value={mobileNo}
           inputMode="numeric"
+          maxLength={10}
           onChangeText={text => setmobileNo(text)}
         />
         <TextInput
@@ -129,10 +108,16 @@ const SignUp = ({navigation}: any) => {
           onChangeText={text => setReEnteredPassword(text)}
         />
 
-        <TouchableOpacity style={styles.signUpBtn} onPress={saveUserData}>
-          <Text style={styles.signUpText}>Sign Up</Text>
-        </TouchableOpacity>
+        <View style={{marginTop: 10}}>
+        <Button
+          color="#F28482"
+          onPress={saveUserData}
+          text="Sign Up"
+          textColor="#FFF"
+        />
+        </View>
 
+       
       </View>
     </View>
   );
@@ -145,7 +130,7 @@ const styles = StyleSheet.create({
   },
   innerContainer: {
     marginHorizontal: 30,
-    marginTop:140,
+    marginTop: 140,
   },
   title: {
     fontSize: 24,
@@ -162,24 +147,6 @@ const styles = StyleSheet.create({
     paddingVertical: 13,
     color: '#000000',
     fontSize: 14,
-  },
-  signUpBtn: {
-    marginTop: 10,
-    backgroundColor: '#F28482',
-    borderRadius: 30,
-  },
-  signUpText: {
-    color: '#fff',
-    textAlign: 'center',
-    fontSize: 18,
-    paddingVertical: 13,
-    fontWeight: '700',
-  },
-  forgotPass: {
-    fontSize: 14,
-    textAlign: 'right',
-    marginTop: 21,
-    color: '#34495E',
   },
 });
 

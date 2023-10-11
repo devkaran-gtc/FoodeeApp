@@ -1,10 +1,12 @@
-import React from 'react'
-import { Text } from 'react-native'
+import React from 'react';
+import {Text, View} from 'react-native';
 
 const Location = () => {
   return (
-    <Text style={{color:'black'}}>Location screen</Text>
-  )
-}
+    <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+      <Text style={{color: 'black'}}>Location Screen</Text>
+    </View>
+  );
+};
 
-export default Location
+export default Location;

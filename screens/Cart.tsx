@@ -7,6 +7,9 @@ import {
   FlatList,
   Alert,
   ScrollView,
+  TextInput,
+  NativeSyntheticEvent,
+  TextInputFocusEventData,
 } from 'react-native';
 import Header from '../components/Header';
 import CartItem from '../components/CartItem';
@@ -163,7 +166,7 @@ const Cart = ({navigation}: any) => {
     } else if (currentStep === 'details') {
       setCurrentStep('payment');
     } else if (currentStep === 'payment') {
-      console.log('do payment process');
+      navigation.navigate('PaymentScreen');
     }
   };
 
@@ -270,24 +273,6 @@ const Cart = ({navigation}: any) => {
           <ScrollView
             showsVerticalScrollIndicator={false}
             contentContainerStyle={{paddingBottom: 104}}>
-            {/* <FlatList
-            data={cartItems}
-            keyExtractor={(item, index) => index.toString()}
-            showsVerticalScrollIndicator={false}
-            renderItem={({item, index}) => (
-              <CartItem
-                counter={item.itemCount}
-                imgUrl={item.imgUrl}
-                name={item.name}
-                onDecrement={() => handleDecrement(index)}
-                onIncrement={() => handleIncrement(index)}
-                price={item.price}
-                onLongPress={() => {
-                  onDelete(index);
-                }}
-              />
-            )}
-          /> */}
 
             {cartItems.map((item, index) => (
               <CartItem
@@ -351,15 +336,7 @@ const Cart = ({navigation}: any) => {
       )}
       {currentStep === 'payment' && (
         <>
-          <Text
-            style={{
-              color: 'black',
-              marginTop: 100,
-              justifyContent: 'center',
-              textAlign: 'center',
-            }}>
-            payment
-          </Text>
+          <Text>Payment related info</Text>
         </>
       )}
 

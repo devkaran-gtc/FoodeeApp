@@ -10,7 +10,6 @@ import {
   Pressable,
 } from 'react-native';
 import OnBoardItem from '../components/OnBoardItem';
-import {checkIfUserIsSignedIn} from '../components/CheckIfUserIsSignedIn';
 import { CommonActions } from '@react-navigation/native';
 
 

@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   StyleSheet,
   Text,
@@ -8,13 +8,15 @@ import {
   ToastAndroid,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import TopBackNavigation from '../components/TopBackNavigation';
+import SimpleHeader from '../components/SimpleHeader';
 
-const ForgotPassword = ({navigation}: any) => {
+const ForgotPassword = ({navigation, route}: any) => {
   const [newPass, setNewPass] = useState('');
   const [newRePass, setNewRePass] = useState('');
   const [oldPass, setOldPass] = useState('');
-  
+
+  const fromProfile = route.params?.fromProfile || false;
+
   const updatePassword = async () => {
     try {
       const userDataJSON = await AsyncStorage.getItem('userData');
@@ -48,7 +50,12 @@ const ForgotPassword = ({navigation}: any) => {
               25,
               50,
             );
-            navigation.navigate('SignInScreen');
+
+            if (fromProfile) {
+              navigation.goBack();
+            } else {
+              navigation.navigate('SignInScreen');
+            }
           } else {
             ToastAndroid.showWithGravityAndOffset(
               'new password should be same',
@@ -58,7 +65,6 @@ const ForgotPassword = ({navigation}: any) => {
               50,
             );
             console.log('new password should be same');
-
           }
         } else {
           ToastAndroid.showWithGravityAndOffset(
@@ -69,7 +75,6 @@ const ForgotPassword = ({navigation}: any) => {
             50,
           );
           console.log('Old password is incorrect');
-
         }
       }
     } catch (error) {
@@ -79,31 +84,7 @@ const ForgotPassword = ({navigation}: any) => {
 
   return (
     <View style={styles.container}>
-      <View
-        style={{
-          flexDirection: 'row',
-          marginHorizontal: 15,
-          marginTop: 45,
-        }}>
-        <TopBackNavigation />
-        <View
-          style={{
-            justifyContent: 'center',
-            alignItems: 'center',
-            marginStart: 84,
-          }}>
-          <Text
-            style={{
-              fontFamily: 'Poppins-Regular',
-              fontSize: 18,
-              lineHeight: 27,
-              fontWeight: '700',
-              color: 'black',
-            }}>
-            Forgot Password
-          </Text>
-        </View>
-      </View>
+      <SimpleHeader title={fromProfile ? "Change Password" : "Forgot Password"} />
 
       <View style={styles.innerContainer}>
         <Text style={styles.title}>Enter Old Password</Text>

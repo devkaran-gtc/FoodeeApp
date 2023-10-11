@@ -1,16 +1,10 @@
 import React, {useState} from 'react';
-import {
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-  TextInput,
-  ToastAndroid,
-  Pressable,
-} from 'react-native';
+import {StyleSheet, Text, View, TextInput, Pressable} from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import TopBackNavigation from '../components/TopBackNavigation';
 import {CommonActions} from '@react-navigation/native';
+import {showToast} from '../components/Toast';
+import Button from '../components/Button';
 
 const SignIn = ({navigation}: any) => {
   const [username, setUsername] = useState('');
@@ -23,14 +17,7 @@ const SignIn = ({navigation}: any) => {
       if (userDataJSON) {
         const userData = JSON.parse(userDataJSON);
         if (!username || !password) {
-          ToastAndroid.showWithGravityAndOffset(
-            'Enter Username && Password',
-            ToastAndroid.LONG,
-            ToastAndroid.BOTTOM,
-            25,
-            50,
-          );
-          return;
+          showToast('Enter Username && Password');
         } else {
           if (
             userData.username === username &&
@@ -49,27 +36,15 @@ const SignIn = ({navigation}: any) => {
               }),
             );
             // navigation.navigate('HomePageScreen');
-            
+
             setUsername('');
             setPassword('');
           } else {
-            ToastAndroid.showWithGravityAndOffset(
-              'Invalid username or password. Please try again.',
-              ToastAndroid.LONG,
-              ToastAndroid.BOTTOM,
-              25,
-              50,
-            );
+            showToast('Invalid username or password. Please try again');
           }
         }
       } else {
-        ToastAndroid.showWithGravityAndOffset(
-          'No user data found. Please sign up',
-          ToastAndroid.LONG,
-          ToastAndroid.BOTTOM,
-          25,
-          50,
-        );
+        showToast('No user data found. Please sign up');
       }
     } catch (error) {
       console.error('Error checking user data:', error);
@@ -100,9 +75,14 @@ const SignIn = ({navigation}: any) => {
           onChangeText={text => setPassword(text)}
         />
 
-        <TouchableOpacity style={styles.signInBtn} onPress={checkSignIn}>
-          <Text style={styles.signInText}>Sign In</Text>
-        </TouchableOpacity>
+        <View style={{marginTop:10}}>
+          <Button
+            color="#F28482"
+            onPress={checkSignIn}
+            text="Sign In"
+            textColor="#fff"
+          />
+        </View>
 
         <Pressable
           onPress={() => {
@@ -141,29 +121,17 @@ const styles = StyleSheet.create({
     color: '#000000',
     fontSize: 14,
   },
-  signInBtn: {
-    marginTop: 10,
-    backgroundColor: '#F28482',
-    borderRadius: 30,
-  },
-  signInText: {
-    color: '#fff',
-    textAlign: 'center',
-    fontSize: 18,
-    paddingVertical: 13,
-    fontWeight: '700',
-    fontFamily: 'Poppins-Regular',
-  },
+
   forgotPass: {
     fontSize: 14,
     textAlign: 'right',
     marginTop: 21,
     color: '#34495E',
+    paddingVertical: 5,
+    right: 0,
+    position: 'absolute',
     fontFamily: 'Roboto-Regular',
   },
 });
 
 export default SignIn;
-function alert(arg0: string) {
-  throw new Error('Function not implemented.');
-}

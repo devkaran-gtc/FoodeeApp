@@ -12,6 +12,16 @@ import Cart from './screens/Cart';
 import ForgotPassword from './screens/ForgotPassword';
 import OnBoard from './screens/OnBoard';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import PaymentSettings from './screens/PaymentSettings';
+import AddCard from './screens/AddCard';
+import MyProfile from './screens/MyProfile';
+import MyVoucher from './screens/MyVoucher';
+import ManagePaymentMethod from './screens/ManagePaymentMethod';
+import PaymentScreen from './screens/PaymentScreen';
+import PaymentStatus from './screens/PaymentStatus';
+import Notification from './screens/Notification';
+import ContactUs from './screens/ContactUs';
+import AboutUs from './screens/AboutUs';
 
 export type RootStackParam = {
   FirstScreen: any;
@@ -22,6 +32,16 @@ export type RootStackParam = {
   Cart: any;
   ForgotPassword: any;
   OnBoard: any;
+  PaymentSettings: any;
+  AddCard: any;
+  MyProfile: any;
+  MyVoucher: any;
+  ManagePaymentMethod: any;
+  PaymentScreen: any;
+  PaymentStatus: any;
+  Notification: any;
+  ContactUs: any;
+  AboutUs:any;
 };
 
 const RootStack = createNativeStackNavigator<RootStackParam>();
@@ -89,6 +109,19 @@ function App() {
         <RootStack.Screen name="FoodInfo" component={FoodInfo} />
         <RootStack.Screen name="Cart" component={Cart} />
         <RootStack.Screen name="ForgotPassword" component={ForgotPassword} />
+        <RootStack.Screen name="PaymentSettings" component={PaymentSettings} />
+        <RootStack.Screen name="AddCard" component={AddCard} />
+        <RootStack.Screen name="MyProfile" component={MyProfile} />
+        <RootStack.Screen name="MyVoucher" component={MyVoucher} />
+        <RootStack.Screen
+          name="ManagePaymentMethod"
+          component={ManagePaymentMethod}
+        />
+        <RootStack.Screen name="PaymentScreen" component={PaymentScreen} />
+        <RootStack.Screen name="PaymentStatus" component={PaymentStatus} />
+        <RootStack.Screen name="Notification" component={Notification} />
+        <RootStack.Screen name="ContactUs" component={ContactUs} />
+        <RootStack.Screen name="AboutUs" component={AboutUs} />
       </RootStack.Navigator>
     </NavigationContainer>
   );
