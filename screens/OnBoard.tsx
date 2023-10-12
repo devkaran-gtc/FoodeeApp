@@ -1,38 +1,19 @@
-import React, {useEffect, useRef} from 'react';
+import React, { useRef} from 'react';
 import {
   Dimensions,
   FlatList,
   StyleSheet,
   TouchableOpacity,
   View,
-  Animated,
-  Text,
-  Pressable,
 } from 'react-native';
 import OnBoardItem from '../components/OnBoardItem';
-import { CommonActions } from '@react-navigation/native';
+import {CommonActions} from '@react-navigation/native';
+import Button from '../components/Button';
 
 
 const {width} = Dimensions.get('window');
 
 const OnBoard = ({navigation}: any) => {
-
-
-const handleOnPressNext = () => {
-  navigation.dispatch(
-    CommonActions.reset({
-      index: 0,
-      routes: [
-        {
-          name: 'FirstScreen',
-        },
-      ],
-    })
-  );
-  // navigation.navigate('FirstScreen');
-};
-
-
   const [activeSlide, setActiveSlide] = React.useState(0);
   const flatListRef = useRef<FlatList | null>(null);
 
@@ -90,6 +71,24 @@ const handleOnPressNext = () => {
     setActiveSlide(index);
   };
 
+  const handleOnPressNext = () => {
+    if (activeSlide < onBoardItems.length - 1) {
+      scrollToIndex(activeSlide + 1);
+     
+    } else {
+      navigation.dispatch(
+        CommonActions.reset({
+          index: 0,
+          routes: [
+            {
+              name: 'FirstScreen',
+            },
+          ],
+        }),
+      );
+    }
+  };
+
   return (
     <View style={styles.container}>
       <FlatList
@@ -98,6 +97,7 @@ const handleOnPressNext = () => {
         horizontal
         showsHorizontalScrollIndicator={false}
         pagingEnabled
+        ref={flatListRef}
         onScroll={handleScroll}
         renderItem={({item}) => (
           <OnBoardItem
@@ -108,11 +108,19 @@ const handleOnPressNext = () => {
         )}
       />
 
-      <Pressable
-        style={{justifyContent: 'center', alignItems: 'center', bottom: 50}}
-        onPress={handleOnPressNext}>
-        <Text>next</Text>
-      </Pressable>
+      <View
+        style={{
+          bottom: 100,
+          marginHorizontal:30,
+        }}>
+        <Button
+          color="#ECF0F1"
+          onPress={()=>{
+            handleOnPressNext();
+          }}
+          text={activeSlide === onBoardItems.length - 1 ? 'Start' : 'Next'} textColor='black'
+        />
+      </View>
 
       <View style={styles.dotContainer}>
         {onBoardItems.map((_, index) => renderDot(index))}

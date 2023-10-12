@@ -94,7 +94,8 @@ const AddCard = ({navigation}: any) => {
         showToast('Card added successfully.');
         console.log(cardDetails);
 
-        navigation.navigate('PaymentSettings');
+        // navigation.navigate('PaymentSettings');
+        navigation.goBack();
       } catch (error) {
         console.error('Error storing card in AsyncStorage:', error);
       }

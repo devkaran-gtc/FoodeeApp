@@ -125,7 +125,7 @@ const MyProfile = ({navigation}: any) => {
                   console.error(response.errorMessage);
                 } else {
                   setAvatarSource(response.assets[0].uri);
-                  console.log(response.assets[0].uri);
+                  // console.log(response.assets[0].uri);
                 }
               });
             },
@@ -139,7 +139,7 @@ const MyProfile = ({navigation}: any) => {
                   console.error(response.errorMessage);
                 } else {
                   setAvatarSource(response.assets[0].uri);
-                  console.log(response.assets[0].uri);
+                  // console.log(response.assets[0].uri);
                 }
               });
             },
@@ -193,7 +193,8 @@ const MyProfile = ({navigation}: any) => {
 
     try {
       await AsyncStorage.setItem('userData', JSON.stringify(updatedUserData));
-      navigation.navigate('Profile', {updatedProfileName: username});
+      // navigation.navigate('Profile', {updatedProfileName: username});
+      navigation.goBack();
     } catch (error) {
       console.error('Error saving user data:', error);
     }
