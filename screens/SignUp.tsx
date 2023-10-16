@@ -41,6 +41,7 @@ const SignUp = ({navigation}: any) => {
 
       const userDataJSON = JSON.stringify(userData);
 
+      await AsyncStorage.setItem('userIsSignedIn', 'true');
       await AsyncStorage.setItem('userData', userDataJSON);
 
       console.log('User data saved successfully.');
@@ -109,15 +110,13 @@ const SignUp = ({navigation}: any) => {
         />
 
         <View style={{marginTop: 10}}>
-        <Button
-          color="#F28482"
-          onPress={saveUserData}
-          text="Sign Up"
-          textColor="#FFF"
-        />
+          <Button
+            color="#F28482"
+            onPress={saveUserData}
+            text="Sign Up"
+            textColor="#FFF"
+          />
         </View>
-
-       
       </View>
     </View>
   );

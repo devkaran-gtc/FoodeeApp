@@ -22,6 +22,7 @@ import PaymentStatus from './screens/PaymentStatus';
 import Notification from './screens/Notification';
 import ContactUs from './screens/ContactUs';
 import AboutUs from './screens/AboutUs';
+import {enableLatestRenderer} from 'react-native-maps';
 
 export type RootStackParam = {
   FirstScreen: any;
@@ -41,7 +42,7 @@ export type RootStackParam = {
   PaymentStatus: any;
   Notification: any;
   ContactUs: any;
-  AboutUs:any;
+  AboutUs: any;
 };
 
 const RootStack = createNativeStackNavigator<RootStackParam>();
@@ -60,6 +61,7 @@ function LoadingIndicator() {
 }
 
 function App() {
+  enableLatestRenderer();
   const [initialRoute, setInitialRoute] =
     useState<keyof RootStackParam>('OnBoard');
   const [isLoading, setIsLoading] = useState(true);
