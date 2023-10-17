@@ -5,6 +5,7 @@ import TopBackNavigation from '../components/TopBackNavigation';
 import {CommonActions} from '@react-navigation/native';
 import {showToast} from '../components/Toast';
 import Button from '../components/Button';
+import auth from '@react-native-firebase/auth';
 
 const SignIn = ({navigation}: any) => {
   const [username, setUsername] = useState('');
@@ -12,42 +13,37 @@ const SignIn = ({navigation}: any) => {
 
   const checkSignIn = async () => {
     try {
-      const userDataJSON = await AsyncStorage.getItem('userData');
-
-      if (userDataJSON) {
-        const userData = JSON.parse(userDataJSON);
-        if (!username || !password) {
-          showToast('Enter Username && Password');
-        } else {
-          if (
-            userData.username === username &&
-            userData.password === password
-          ) {
-            await AsyncStorage.setItem('userIsSignedIn', 'true');
-
-            navigation.dispatch(
-              CommonActions.reset({
-                index: 0,
-                routes: [
-                  {
-                    name: 'HomePageScreen',
-                  },
-                ],
-              }),
-            );
-            // navigation.navigate('HomePageScreen');
-
-            setUsername('');
-            setPassword('');
-          } else {
-            showToast('Invalid username or password. Please try again');
-          }
-        }
+      if (!username || !password) {
+        showToast('Enter Username && Password');
       } else {
-        showToast('No user data found. Please sign up');
+        const userCredential = await auth().signInWithEmailAndPassword(
+          username,
+          password,
+        );
+        const user = userCredential.user;
+
+        if (user) {
+          await AsyncStorage.setItem('userIsSignedIn', 'true');
+
+          navigation.dispatch(
+            CommonActions.reset({
+              index: 0,
+              routes: [
+                {
+                  name: 'HomePageScreen',
+                },
+              ],
+            }),
+          );
+
+          setUsername('');
+          setPassword('');
+        } else {
+          showToast('Invalid username or password. Please try again');
+        }
       }
     } catch (error) {
-      console.error('Error checking user data:', error);
+      showToast('Invalid username or password. Please try again');
     }
   };
 
@@ -75,7 +71,7 @@ const SignIn = ({navigation}: any) => {
           onChangeText={text => setPassword(text)}
         />
 
-        <View style={{marginTop:10}}>
+        <View style={{marginTop: 10}}>
           <Button
             color="#F28482"
             onPress={checkSignIn}

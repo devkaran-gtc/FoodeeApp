@@ -8,69 +8,29 @@ import {
   TextInput,
   PermissionsAndroid,
   Alert,
-  Platform,
 } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import Button from '../components/Button';
 import SimpleHeader from '../components/SimpleHeader';
 import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
+import auth from '@react-native-firebase/auth';
+import firestore from '@react-native-firebase/firestore';
+import storage from '@react-native-firebase/storage';
 
 const MyProfile = ({navigation}: any) => {
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [mobileNo, setMobileNo] = useState('');
-  const [avatarSource, setAvatarSource] = useState(null);
+  const [avatarSource, setAvatarSource] = useState<any>(null);
   const [permissionsGranted, setPermissionsGranted] = useState(false);
+
+  const [userData, setUserData] = useState<any>(null);
 
   const options: any = {
     mediaType: 'photo',
-    includeBase64: true,
+    includeBase64: false,
     maxWidth: 2000,
     maxHeight: 2000,
   };
-
-  /*  useEffect(() => {
-    async function checkPermissions() {
-      try {
-        const cameraPermission = await PermissionsAndroid.check(
-          PermissionsAndroid.PERMISSIONS.CAMERA,
-        );
-        const galleryPermission = await PermissionsAndroid.check(
-          PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
-        );
-
-        if (cameraPermission && galleryPermission) {
-          setPermissionsGranted(true);
-        }
-      } catch (error) {
-        console.error('Error checking permissions:', error);
-      }
-    }
-
-    checkPermissions();
-  }, []); */
-
-  /* const requestCameraAndGalleryPermission = async () => {
-    try {
-      const granted = await PermissionsAndroid.requestMultiple([
-        PermissionsAndroid.PERMISSIONS.CAMERA,
-        PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
-      ]);
-
-      if (
-        granted['android.permission.CAMERA'] ===
-          PermissionsAndroid.RESULTS.GRANTED &&
-        granted['android.permission.READ_EXTERNAL_STORAGE'] ===
-          PermissionsAndroid.RESULTS.GRANTED
-      ) {
-        setPermissionsGranted(true);
-      } else {
-        console.log('Camera or gallery permission denied');
-      }
-    } catch (err) {
-      console.warn(err);
-    }
-  }; */
 
   useEffect(() => {
     async function checkPermissions() {
@@ -156,28 +116,29 @@ const MyProfile = ({navigation}: any) => {
     }
   };
 
-  const [userData, setUserData] = useState({
-    username: '',
-    email: '',
-    mobileNo: '',
-    password: '',
-    img: '',
-  });
-
   useEffect(() => {
     async function fetchUserData() {
-      try {
-        const userDataJSON = await AsyncStorage.getItem('userData');
-        if (userDataJSON) {
-          const storedUserData = JSON.parse(userDataJSON);
-          setUserData(storedUserData);
-          setUsername(storedUserData.username);
-          setEmail(storedUserData.email);
-          setMobileNo(storedUserData.mobileNo);
-          setAvatarSource(storedUserData.img);
-        }
-      } catch (error) {
-        console.error('Error fetching user data:', error);
+      const user = auth().currentUser;
+      if (user) {
+        const userId = user.uid;
+        const userRef = firestore().collection('users').doc(userId);
+        userRef
+          .get()
+          .then(documentSnapshot => {
+            if (documentSnapshot.exists) {
+              const userData: any = documentSnapshot.data();
+              setUserData(userData);
+              setUsername(userData.username);
+              setEmail(userData.email);
+              setMobileNo(userData.mobileNo);
+              setAvatarSource(userData.profilePic);
+            } else {
+              console.log('User data not found');
+            }
+          })
+          .catch(error => {
+            console.error('Error fetching user data:', error);
+          });
       }
     }
 
@@ -185,18 +146,40 @@ const MyProfile = ({navigation}: any) => {
   }, []);
 
   const updateProfile = async () => {
-    const updatedUserData = {
-      ...userData,
-      username: username,
-      img: avatarSource,
-    };
+    const user = auth().currentUser;
+    if (user) {
+      const userId = user.uid;
 
-    try {
-      await AsyncStorage.setItem('userData', JSON.stringify(updatedUserData));
-      // navigation.navigate('Profile', {updatedProfileName: username});
-      navigation.goBack();
-    } catch (error) {
-      console.error('Error saving user data:', error);
+      const updatedUserData: any = {
+        username: username,
+        email: email,
+        mobileNo: mobileNo,
+      };
+
+      try {
+        await firestore()
+          .collection('users')
+          .doc(userId)
+          .update(updatedUserData);
+          if (avatarSource !== userData.profilePic) {
+            const imageFileName = `profile_picture_${userId}.jpg`;
+            const reference = storage().ref(`profile_pictures/${imageFileName}`);
+            await reference.putFile(avatarSource);
+            const imageUrl = await reference.getDownloadURL();
+            updatedUserData.profilePic = imageUrl;
+          }
+
+        await firestore()
+          .collection('users')
+          .doc(userId)
+          .update(updatedUserData);
+
+        setUserData(updatedUserData);
+
+        navigation.goBack();
+      } catch (error) {
+        console.error('Error updating user data:', error);
+      }
     }
   };
 

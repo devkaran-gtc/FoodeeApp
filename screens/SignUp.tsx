@@ -1,17 +1,12 @@
 import React, {useState} from 'react';
-import {
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-  TextInput,
-  ToastAndroid,
-} from 'react-native';
+import {StyleSheet, Text, View, TextInput} from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import TopBackNavigation from '../components/TopBackNavigation';
 import Button from '../components/Button';
 import {CommonActions} from '@react-navigation/native';
 import {showToast} from '../components/Toast';
+import auth from '@react-native-firebase/auth';
+import firestore from '@react-native-firebase/firestore';
 
 const SignUp = ({navigation}: any) => {
   const [username, setUsername] = useState('');
@@ -32,29 +27,54 @@ const SignUp = ({navigation}: any) => {
     } else if (password.length < 6) {
       showToast('Password must be at least 6 characters long');
     } else {
-      const userData = {
-        username: username,
-        password: password,
-        email: email,
-        mobileNo: mobileNo,
-      };
+      try {
+        const userCredential = await auth().createUserWithEmailAndPassword(
+          email,
+          password,
+        );
+        const user = userCredential.user;
 
-      const userDataJSON = JSON.stringify(userData);
+        await firestore().collection('users').doc(user.uid).set({
+          username: username,
+          email: email,
+          mobileNo: mobileNo,
+          password: password,
+          profilePic: null,
+        });
 
-      await AsyncStorage.setItem('userIsSignedIn', 'true');
-      await AsyncStorage.setItem('userData', userDataJSON);
+        await AsyncStorage.setItem('userIsSignedIn', 'true');
+        const hasSeenOnboarding = await AsyncStorage.getItem(
+          'hasSeenOnboarding',
+        );
 
-      console.log('User data saved successfully.');
-      navigation.dispatch(
-        CommonActions.reset({
-          index: 0,
-          routes: [
-            {
-              name: 'HomePageScreen',
-            },
-          ],
-        }),
-      );
+        if (hasSeenOnboarding) {
+          console.log('User data saved successfully.');
+          navigation.dispatch(
+            CommonActions.reset({
+              index: 0,
+              routes: [
+                {
+                  name: 'HomePageScreen',
+                },
+              ],
+            }),
+          );
+        } else {
+          navigation.dispatch(
+            CommonActions.reset({
+              index: 0,
+              routes: [
+                {
+                  name: 'OnBoard',
+                },
+              ],
+            }),
+          );
+        }
+      } catch (error) {
+        console.error('Error signing up:', error);
+        showToast('Sign-up failed');
+      }
     }
   };
 

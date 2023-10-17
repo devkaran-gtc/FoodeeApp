@@ -70,7 +70,7 @@ function App() {
     const checkIfOnboardingSeen = async () => {
       const hasSeenOnboarding = await AsyncStorage.getItem('hasSeenOnboarding');
 
-      if (hasSeenOnboarding) {
+      /*  if (hasSeenOnboarding) {
         const userIsSignedIn = await checkIfUserIsSignedIn();
         if (userIsSignedIn) {
           setInitialRoute('HomePageScreen');
@@ -79,6 +79,13 @@ function App() {
         }
       } else {
         await AsyncStorage.setItem('hasSeenOnboarding', 'true');
+      } */
+
+      const userIsSignedIn = await checkIfUserIsSignedIn();
+      if (userIsSignedIn) {
+        setInitialRoute('HomePageScreen');
+      } else {
+        setInitialRoute('FirstScreen');
       }
 
       setIsLoading(false);
@@ -139,3 +146,5 @@ const styles = StyleSheet.create({
 });
 
 export default App;
+
+

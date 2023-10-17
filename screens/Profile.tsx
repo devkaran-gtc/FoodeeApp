@@ -1,50 +1,86 @@
 import React, {useEffect, useState} from 'react';
-import {Pressable, StyleSheet, Text, View, Image} from 'react-native';
+import {Pressable, StyleSheet, Text, View, Image, Alert} from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {CommonActions} from '@react-navigation/native';
 import ProfileMenuItem from '../components/ProfileMenuItem';
 import Button from '../components/Button';
 import SimpleHeader from '../components/SimpleHeader';
 import {useFocusEffect} from '@react-navigation/native';
+import auth from '@react-native-firebase/auth';
+import firestore from '@react-native-firebase/firestore';
 
 const Profile = ({navigation}: any) => {
   const [username, setUsername] = useState('');
   const [mobileNo, setmobileNo] = useState('');
   const [profileImg, setProfileImg] = useState('');
 
-  const fetchCardData = () => {
-    AsyncStorage.getItem('userData')
-      .then(cardItemsJson => {
-        if (cardItemsJson) {
-          const parsedCartItems = JSON.parse(cardItemsJson);
-          setProfileImg(parsedCartItems.img);
-          setUsername(parsedCartItems.username);
-          setmobileNo(parsedCartItems.mobileNo);
-        }
-      })
-      .catch(error => {
-        console.error('Error loading card data:', error);
-      });
-  };
-
   useFocusEffect(
     React.useCallback(() => {
-      fetchCardData();
+      async function fetchUserData() {
+        const user = auth().currentUser;
+        if (user) {
+          const userId = user.uid;
+          const userRef = firestore().collection('users').doc(userId);
+          userRef
+            .get()
+            .then(documentSnapshot => {
+              if (documentSnapshot.exists) {
+                const userData: any = documentSnapshot.data();
+                setUsername(userData.username);
+                setmobileNo(userData.mobileNo);
+                setProfileImg(userData.profilePic);
+              } else {
+                console.log('User data not found');
+              }
+            })
+            .catch(error => {
+              console.error('Error fetching user data:', error);
+            });
+        }
+      }
+
+      fetchUserData();
     }, []),
   );
-  const signOut = async () => {
-    await AsyncStorage.removeItem('userIsSignedIn');
 
-    navigation.dispatch(
-      CommonActions.reset({
-        index: 0,
-        routes: [
+  const signOut = async () => {
+    try {
+      await auth().signOut();
+      await AsyncStorage.removeItem('userIsSignedIn');
+
+      Alert.alert(
+        'Sign Out',
+        'Are you sure you want to sign out?',
+        [
           {
-            name: 'SignInScreen',
+            text: 'Cancel',
+            style: 'cancel',
+          },
+          {
+            text: 'Sign Out',
+            onPress: () => {
+              navigation.dispatch(
+                CommonActions.reset({
+                  index: 0,
+                  routes: [
+                    {
+                      name: 'SignInScreen',
+                    },
+                  ],
+                }),
+              );
+            },
           },
         ],
-      }),
-    );
+        {cancelable: false},
+      );
+    } catch (error) {
+      console.error('Error signing out:', error);
+      Alert.alert(
+        'Sign Out Error',
+        'There was an error signing out. Please try again.',
+      );
+    }
   };
 
   return (

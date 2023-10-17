@@ -7,78 +7,94 @@ import {
   TextInput,
   ToastAndroid,
 } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import SimpleHeader from '../components/SimpleHeader';
+import auth, {firebase} from '@react-native-firebase/auth';
+import firestore from '@react-native-firebase/firestore';
+import {showToast} from '../components/Toast';
 
 const ForgotPassword = ({navigation, route}: any) => {
   const [newPass, setNewPass] = useState('');
   const [newRePass, setNewRePass] = useState('');
   const [oldPass, setOldPass] = useState('');
+  const [userData, setUserData] = useState<any>(null);
 
   const fromProfile = route.params?.fromProfile || false;
 
-  const updatePassword = async () => {
-    try {
-      const userDataJSON = await AsyncStorage.getItem('userData');
-
-      if (userDataJSON) {
-        const userData = JSON.parse(userDataJSON);
-        if (!newPass || !newRePass || !oldPass) {
-          ToastAndroid.showWithGravityAndOffset(
-            'Fields are empty',
-            ToastAndroid.SHORT,
-            ToastAndroid.BOTTOM,
-            25,
-            50,
-          );
-        } else if (userData.password === oldPass) {
-          if (newPass === newRePass) {
-            const updatedUserData = {
-              ...userData,
-              password: newPass,
-            };
-
-            const updatedUserDataJSON = JSON.stringify(updatedUserData);
-
-            await AsyncStorage.setItem('userData', updatedUserDataJSON);
-
-            console.log('Password updated successfully.');
-            ToastAndroid.showWithGravityAndOffset(
-              'Password updated successfully.',
-              ToastAndroid.SHORT,
-              ToastAndroid.BOTTOM,
-              25,
-              50,
-            );
-
-            if (fromProfile) {
-              navigation.goBack();
+  useEffect(() => {
+    async function fetchUserData() {
+      const user = auth().currentUser;
+      if (user) {
+        const userId = user.uid;
+        const userRef = firestore().collection('users').doc(userId);
+        userRef
+          .get()
+          .then(documentSnapshot => {
+            if (documentSnapshot.exists) {
+              const userData: any = documentSnapshot.data();
+              setUserData(userData);              
             } else {
-              navigation.navigate('SignInScreen');
+              console.log('User data not found');
             }
-          } else {
-            ToastAndroid.showWithGravityAndOffset(
-              'new password should be same',
-              ToastAndroid.SHORT,
-              ToastAndroid.BOTTOM,
-              25,
-              50,
-            );
-            console.log('new password should be same');
-          }
-        } else {
-          ToastAndroid.showWithGravityAndOffset(
-            'Old password is incorrect',
-            ToastAndroid.SHORT,
-            ToastAndroid.BOTTOM,
-            25,
-            50,
-          );
-          console.log('Old password is incorrect');
-        }
+          })
+          .catch(error => {
+            console.error('Error fetching user data:', error);
+          });
       }
-    } catch (error) {
-      console.error('Error saving user data:', error);
+    }
+
+    fetchUserData();
+  }, []);
+
+  const updatePassword = async () => {
+    if (!newPass || !newRePass || !oldPass) {
+      ToastAndroid.showWithGravityAndOffset(
+        'Fields are empty',
+        ToastAndroid.SHORT,
+        ToastAndroid.BOTTOM,
+        25,
+        50,
+      );
+    } else if (userData.password === oldPass) {
+      const user = auth().currentUser;
+      if (user) {
+        const email: any = user.email;
+        const credential = firebase.auth.EmailAuthProvider.credential(
+          email,
+          oldPass,
+        );
+
+        try {
+          await user.reauthenticateWithCredential(credential);
+          await user.updatePassword(newPass);
+
+          const userId = user.uid;
+          const userRef = firestore().collection('users').doc(userId);
+
+          await userRef.update({
+            password: newPass,
+          });
+
+          console.log(
+            'Password updated successfully in both Authentication and Firestore.',
+          );
+          showToast('password updated successfully');
+
+          if (fromProfile) {
+            navigation.goBack();
+          } else {
+            navigation.navigate('SignInScreen');
+          }
+        } catch (error) {
+          showToast('Error updating password');
+          console.log('Error updating password:', error);
+        }
+      } else {
+        showToast('User not authenticated');
+        console.log('User not authenticated');
+      }
+    } else {
+      showToast('Old password is incorrect');
+      console.log('Old password is incorrect');
     }
   };
 

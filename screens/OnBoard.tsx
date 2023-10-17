@@ -9,6 +9,7 @@ import {
 import OnBoardItem from '../components/OnBoardItem';
 import {CommonActions} from '@react-navigation/native';
 import Button from '../components/Button';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
 const {width} = Dimensions.get('window');
@@ -74,18 +75,23 @@ const OnBoard = ({navigation}: any) => {
   const handleOnPressNext = () => {
     if (activeSlide < onBoardItems.length - 1) {
       scrollToIndex(activeSlide + 1);
-     
     } else {
-      navigation.dispatch(
-        CommonActions.reset({
-          index: 0,
-          routes: [
-            {
-              name: 'FirstScreen',
-            },
-          ],
-        }),
-      );
+      AsyncStorage.setItem('hasSeenOnboarding', 'true')
+        .then(() => {
+          navigation.dispatch(
+            CommonActions.reset({
+              index: 0,
+              routes: [
+                {
+                  name: 'HomePageScreen',
+                },
+              ],
+            })
+          );
+        })
+        .catch((error) => {
+          console.error('Error setting AsyncStorage flag:', error);
+        });
     }
   };
 

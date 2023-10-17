@@ -15,8 +15,9 @@ import FilterIcon from '../assets/icons/FilterIcon';
 import Card from '../components/Card';
 import CategoryCard from '../components/CategoryCard';
 import BestOffersCard from '../components/BestOffersCard';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFocusEffect } from '@react-navigation/native';
+import auth from '@react-native-firebase/auth';
+import firestore from '@react-native-firebase/firestore';
 
 const Home = ({navigation}: any) => {
   const [username, setUsername] = useState('');
@@ -132,24 +133,32 @@ const Home = ({navigation}: any) => {
     },
   ];
 
-  const fetchCardData = () => {
-    AsyncStorage.getItem('userData')
-      .then(cardItemsJson => {
-        if (cardItemsJson) {
-          const parsedCartItems = JSON.parse(cardItemsJson);
-          setProfileImg(parsedCartItems.img);
-          setUsername(parsedCartItems.username);          
-          setmobileNo(parsedCartItems.mobileNo);          
-        }
-      })
-      .catch(error => {
-        console.error('Error loading card data:', error);
-      });
-  };
-
   useFocusEffect(
     React.useCallback(() => {
-      fetchCardData();
+      async function fetchUserData() {
+        const user = auth().currentUser;
+        if (user) {
+          const userId = user.uid;
+          const userRef = firestore().collection('users').doc(userId);
+          userRef
+            .get()
+            .then((documentSnapshot) => {
+              if (documentSnapshot.exists) {
+                const userData:any = documentSnapshot.data();
+                setUsername(userData.username);
+                setmobileNo(userData.mobileNo);
+                setProfileImg(userData.profilePic);
+              } else {
+                console.log('User data not found');
+              }
+            })
+            .catch((error) => {
+              console.error('Error fetching user data:', error);
+            });
+        }
+      }
+  
+      fetchUserData();
     }, [])
   );
 
