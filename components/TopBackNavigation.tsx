@@ -25,7 +25,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
   },
   backButton: {
-    borderRadius: 8,
+    borderRadius: 40/2,
     width: 40,
     height: 40,
     justifyContent: 'center',
