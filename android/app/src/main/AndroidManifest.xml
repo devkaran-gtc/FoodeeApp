@@ -13,5 +13,7 @@
       </intent-filter>
     </activity>
     <meta-data android:name="com.google.android.geo.API_KEY" android:value="AIzaSyCwVvcs1h6Pr3ykHwBMzFOxPEps_hBhMmQ"/>
+    <meta-data android:name="com.google.android.gms.auth.api.signin.client.package_name" android:value="com.foodee" />
+
   </application>
 </manifest>

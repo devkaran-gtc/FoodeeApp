@@ -2,7 +2,7 @@ import React, {Component, useEffect, useState} from 'react';
 import {View, StyleSheet} from 'react-native';
 import MapView, {PROVIDER_GOOGLE, Marker} from 'react-native-maps';
 import Geolocation from '@react-native-community/geolocation';
-import { showToast } from '../components/Toast';
+import {showToast} from '../components/Toast';
 
 const Location = () => {
   const [region, setRegion] = useState({
@@ -12,12 +12,12 @@ const Location = () => {
     longitudeDelta: 0.0121,
   });
 
-   useEffect(() => {
+  useEffect(() => {
     Geolocation.setRNConfiguration({
-      skipPermissionRequests: false, 
-      authorizationLevel: 'auto', 
-      enableBackgroundLocationUpdates: true, 
-      locationProvider: 'auto', 
+      skipPermissionRequests: false,
+      authorizationLevel: 'auto',
+      enableBackgroundLocationUpdates: true,
+      locationProvider: 'auto',
     });
   }, []);
 

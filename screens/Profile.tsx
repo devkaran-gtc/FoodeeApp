@@ -9,6 +9,11 @@ import {useFocusEffect} from '@react-navigation/native';
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 
+import {
+  GoogleSignin,
+  statusCodes,
+} from '@react-native-google-signin/google-signin';
+
 const Profile = ({navigation}: any) => {
   const [username, setUsername] = useState('');
   const [mobileNo, setmobileNo] = useState('');

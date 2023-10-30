@@ -298,7 +298,6 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     height: 44,
     marginHorizontal: 20,
-    marginBottom: 3,
   },
   searchBar: {
     flex: 1,
