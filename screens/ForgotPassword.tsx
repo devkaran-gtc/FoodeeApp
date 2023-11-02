@@ -9,11 +9,41 @@ import {
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import SimpleHeader from '../components/SimpleHeader';
+import EyeOn from '../assets/icons/EyeOn';
+import EyeOff from '../assets/icons/EyeOff';
+import PasswordInput from '../components/PasswordInput';
 
 const ForgotPassword = ({navigation, route}: any) => {
   const [newPass, setNewPass] = useState('');
   const [newRePass, setNewRePass] = useState('');
   const [oldPass, setOldPass] = useState('');
+  const [isNewPassVisible, setIsNewPassVisible] = useState(false);
+  const [isNewRePassVisible, setIsNewRePasswordVisible] = useState(false);
+  const [isPasswordVisible, setIsPasswordVisible] = useState(false);
+
+  const togglePasswordVisibility = () => {
+    setIsPasswordVisible(!isPasswordVisible);
+  };
+
+  const toggleNewPasswordVisibility = () => {
+    setIsNewPassVisible(!isNewPassVisible);
+  };
+
+  const toggleNewRePasswordVisibility = () => {
+    setIsNewRePasswordVisible(!isNewRePassVisible);
+  };
+
+  const renderIcon = () => {
+    return isPasswordVisible ? <EyeOn size={20} /> : <EyeOff size={20} />;
+  };
+
+  const renderPasswordIcon = () => {
+    return isNewPassVisible ? <EyeOn size={20} /> : <EyeOff size={20} />;
+  };
+
+  const renderRePasswordIcon = () => {
+    return isNewRePassVisible ? <EyeOn size={20} /> : <EyeOff size={20} />;
+  };
 
   const fromProfile = route.params?.fromProfile || false;
 
@@ -84,38 +114,34 @@ const ForgotPassword = ({navigation, route}: any) => {
 
   return (
     <View style={styles.container}>
-      <SimpleHeader title={fromProfile ? "Change Password" : "Forgot Password"} />
+      <SimpleHeader
+        title={fromProfile ? 'Change Password' : 'Forgot Password'}
+      />
 
       <View style={styles.innerContainer}>
         <Text style={styles.title}>Enter Old Password</Text>
 
-        <TextInput
-          style={styles.input}
-          placeholder="Password"
-          placeholderTextColor="#00000080"
+        <PasswordInput
           value={oldPass}
-          secureTextEntry={true}
           onChangeText={text => setOldPass(text)}
+          placeholder="Password"
+          secureTextEntry={true}
         />
 
         <Text style={styles.title}>Create New Password</Text>
 
-        <TextInput
-          style={styles.input}
-          placeholder="Enter Password"
-          placeholderTextColor="#00000080"
-          secureTextEntry={true}
+        <PasswordInput
           value={newPass}
           onChangeText={text => setNewPass(text)}
+          placeholder="Enter Password"
+          secureTextEntry={true}
         />
 
-        <TextInput
-          style={styles.input}
-          placeholder="Re-Enter Password"
-          placeholderTextColor="#00000080"
-          secureTextEntry={true}
+        <PasswordInput
           value={newRePass}
           onChangeText={text => setNewRePass(text)}
+          placeholder="Re-Enter Password"
+          secureTextEntry={true}
         />
 
         <TouchableOpacity style={styles.saveBtn} onPress={updatePassword}>

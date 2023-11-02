@@ -12,6 +12,9 @@ import TopBackNavigation from '../components/TopBackNavigation';
 import Button from '../components/Button';
 import {CommonActions} from '@react-navigation/native';
 import {showToast} from '../components/Toast';
+import EyeOn from '../assets/icons/EyeOn';
+import EyeOff from '../assets/icons/EyeOff';
+import PasswordInput from '../components/PasswordInput';
 
 const SignUp = ({navigation}: any) => {
   const [username, setUsername] = useState('');
@@ -19,6 +22,24 @@ const SignUp = ({navigation}: any) => {
   const [reEnteredPassword, setReEnteredPassword] = useState('');
   const [email, setEmail] = useState('');
   const [mobileNo, setmobileNo] = useState('');
+  const [isPasswordVisible, setIsPasswordVisible] = useState(false);
+  const [isRePasswordVisible, setIsRePasswordVisible] = useState(false);
+
+  const togglePasswordVisibility = () => {
+    setIsPasswordVisible(!isPasswordVisible);
+  };
+
+  const toggleRePasswordVisibility = () => {
+    setIsRePasswordVisible(!isRePasswordVisible);
+  };
+
+  const renderPasswordIcon = () => {
+    return isPasswordVisible ? <EyeOn size={20} /> : <EyeOff size={20} />;
+  };
+
+  const renderRePasswordIcon = () => {
+    return isRePasswordVisible ? <EyeOn size={20} /> : <EyeOff size={20} />;
+  };
 
   const saveUserData = async () => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -45,6 +66,7 @@ const SignUp = ({navigation}: any) => {
       await AsyncStorage.setItem('userData', userDataJSON);
 
       console.log('User data saved successfully.');
+      showToast('signed up successfully');
       navigation.dispatch(
         CommonActions.reset({
           index: 0,
@@ -92,21 +114,19 @@ const SignUp = ({navigation}: any) => {
           maxLength={10}
           onChangeText={text => setmobileNo(text)}
         />
-        <TextInput
-          style={styles.input}
-          placeholder="Enter Password"
-          placeholderTextColor="#00000080"
-          secureTextEntry={true}
+
+        <PasswordInput
           value={password}
           onChangeText={text => setPassword(text)}
-        />
-        <TextInput
-          style={styles.input}
-          placeholder="Re-Enter Password"
-          placeholderTextColor="#00000080"
+          placeholder="Enter Password"
           secureTextEntry={true}
+        />
+
+        <PasswordInput
           value={reEnteredPassword}
           onChangeText={text => setReEnteredPassword(text)}
+          placeholder="Re-Enter Password"
+          secureTextEntry={true}
         />
 
         <View style={{marginTop: 10}}>

@@ -1,10 +1,18 @@
 import React, {useState} from 'react';
-import {StyleSheet, Text, View, TextInput, Pressable} from 'react-native';
+import {
+  StyleSheet,
+  Text,
+  View,
+  TextInput,
+  Pressable,
+  TouchableOpacity,
+} from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import TopBackNavigation from '../components/TopBackNavigation';
 import {CommonActions} from '@react-navigation/native';
 import {showToast} from '../components/Toast';
 import Button from '../components/Button';
+import PasswordInput from '../components/PasswordInput';
 
 const SignIn = ({navigation}: any) => {
   const [username, setUsername] = useState('');
@@ -66,16 +74,15 @@ const SignIn = ({navigation}: any) => {
           value={username}
           onChangeText={text => setUsername(text)}
         />
-        <TextInput
-          style={styles.input}
-          placeholder="Password"
-          placeholderTextColor="#00000080"
-          secureTextEntry={true}
+        
+        <PasswordInput
           value={password}
           onChangeText={text => setPassword(text)}
+          placeholder="Enter Password"
+          secureTextEntry={true}
         />
 
-        <View style={{marginTop:10}}>
+        <View style={{marginTop: 10}}>
           <Button
             color="#F28482"
             onPress={checkSignIn}

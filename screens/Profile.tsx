@@ -1,5 +1,13 @@
 import React, {useEffect, useState} from 'react';
-import {Pressable, StyleSheet, Text, View, Image} from 'react-native';
+import {
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
+  Image,
+  ScrollView,
+  Alert,
+} from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {CommonActions} from '@react-navigation/native';
 import ProfileMenuItem from '../components/ProfileMenuItem';
@@ -35,15 +43,31 @@ const Profile = ({navigation}: any) => {
   const signOut = async () => {
     await AsyncStorage.removeItem('userIsSignedIn');
 
-    navigation.dispatch(
-      CommonActions.reset({
-        index: 0,
-        routes: [
-          {
-            name: 'SignInScreen',
+    Alert.alert(
+      'Sign Out',
+      'Are you sure you want to sign out?',
+      [
+        {
+          text: 'Cancel',
+          style: 'cancel',
+        },
+        {
+          text: 'Sign Out',
+          onPress: () => {
+            navigation.dispatch(
+              CommonActions.reset({
+                index: 0,
+                routes: [
+                  {
+                    name: 'FirstScreen',
+                  },
+                ],
+              }),
+            );
           },
-        ],
-      }),
+        },
+      ],
+      {cancelable: false},
     );
   };
 
@@ -91,7 +115,11 @@ const Profile = ({navigation}: any) => {
         </Text>
       </View>
 
-      <View style={{marginTop: 25, marginHorizontal: 20}}>
+      <View
+        style={{
+          marginTop: 25,
+          marginHorizontal: 20,
+        }}>
         <ProfileMenuItem
           title="My Profile"
           onPress={() => {

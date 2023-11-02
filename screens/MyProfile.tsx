@@ -14,6 +14,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import Button from '../components/Button';
 import SimpleHeader from '../components/SimpleHeader';
 import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
+import { showToast } from '../components/Toast';
 
 const MyProfile = ({navigation}: any) => {
   const [username, setUsername] = useState('');
@@ -113,7 +114,7 @@ const MyProfile = ({navigation}: any) => {
   const handleAvatarPress = () => {
     if (permissionsGranted) {
       Alert.alert(
-        'Change Avatar',
+        'ChooseProfile Picture',
         'Choose an option:',
         [
           {
@@ -195,6 +196,7 @@ const MyProfile = ({navigation}: any) => {
       await AsyncStorage.setItem('userData', JSON.stringify(updatedUserData));
       // navigation.navigate('Profile', {updatedProfileName: username});
       navigation.goBack();
+      showToast("profile updated suceesfully");
     } catch (error) {
       console.error('Error saving user data:', error);
     }
