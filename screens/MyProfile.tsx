@@ -9,12 +9,14 @@ import {
   PermissionsAndroid,
   Alert,
   Platform,
+  Keyboard,
+  TouchableWithoutFeedback
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Button from '../components/Button';
 import SimpleHeader from '../components/SimpleHeader';
 import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
-import { showToast } from '../components/Toast';
+import {showToast} from '../components/Toast';
 
 const MyProfile = ({navigation}: any) => {
   const [username, setUsername] = useState('');
@@ -29,49 +31,6 @@ const MyProfile = ({navigation}: any) => {
     maxWidth: 2000,
     maxHeight: 2000,
   };
-
-  /*  useEffect(() => {
-    async function checkPermissions() {
-      try {
-        const cameraPermission = await PermissionsAndroid.check(
-          PermissionsAndroid.PERMISSIONS.CAMERA,
-        );
-        const galleryPermission = await PermissionsAndroid.check(
-          PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
-        );
-
-        if (cameraPermission && galleryPermission) {
-          setPermissionsGranted(true);
-        }
-      } catch (error) {
-        console.error('Error checking permissions:', error);
-      }
-    }
-
-    checkPermissions();
-  }, []); */
-
-  /* const requestCameraAndGalleryPermission = async () => {
-    try {
-      const granted = await PermissionsAndroid.requestMultiple([
-        PermissionsAndroid.PERMISSIONS.CAMERA,
-        PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
-      ]);
-
-      if (
-        granted['android.permission.CAMERA'] ===
-          PermissionsAndroid.RESULTS.GRANTED &&
-        granted['android.permission.READ_EXTERNAL_STORAGE'] ===
-          PermissionsAndroid.RESULTS.GRANTED
-      ) {
-        setPermissionsGranted(true);
-      } else {
-        console.log('Camera or gallery permission denied');
-      }
-    } catch (err) {
-      console.warn(err);
-    }
-  }; */
 
   useEffect(() => {
     async function checkPermissions() {
@@ -196,70 +155,82 @@ const MyProfile = ({navigation}: any) => {
       await AsyncStorage.setItem('userData', JSON.stringify(updatedUserData));
       // navigation.navigate('Profile', {updatedProfileName: username});
       navigation.goBack();
-      showToast("profile updated suceesfully");
+      showToast('profile updated suceesfully');
     } catch (error) {
       console.error('Error saving user data:', error);
     }
   };
 
+  const dismissKeyboard = () => {
+    Keyboard.dismiss();
+  };
+
   return (
-    <View style={styles.container}>
-      <SimpleHeader title="My Profile" />
+    <TouchableWithoutFeedback onPress={dismissKeyboard}>
+      <View style={styles.container}>
+        <SimpleHeader title="My Profile" />
+        <View style={{alignItems: 'center'}}>
+          <Pressable
+            style={{
+              height: 150,
+              width: 150,
+              marginTop: 25,
+              borderRadius: 150 / 2,
+            }}
+            onPress={() => {
+              handleAvatarPress();
+            }}>
+            <Image
+              resizeMode="contain"
+              style={styles.imgContainer}
+              source={
+                avatarSource
+                  ? {uri: avatarSource}
+                  : require('../assets/images/profile.png')
+              }
+            />
+          </Pressable>
+        </View>
 
-      <Pressable
-        style={{alignItems: 'center', marginTop: 25}}
-        onPress={() => {
-          handleAvatarPress();
-        }}>
-        <Image
-          resizeMode="contain"
-          style={styles.imgContainer}
-          source={
-            avatarSource
-              ? {uri: avatarSource}
-              : require('../assets/images/profile.png')
-          }
-        />
-      </Pressable>
-
-      <View style={{marginHorizontal: 30, marginTop: 30}}>
-        <TextInput
-          style={styles.input}
-          placeholder="Enter Username"
-          placeholderTextColor="#00000080"
-          value={username}
-          onChangeText={text => setUsername(text)}
-        />
-
-        <TextInput
-          editable={false}
-          style={styles.input}
-          placeholder="Enter Email"
-          placeholderTextColor="#00000080"
-          value={email}
-          inputMode="email"
-          onChangeText={text => setEmail(text)}
-        />
-        <TextInput
-          editable={false}
-          style={styles.input}
-          placeholder="Enter Mobile No"
-          placeholderTextColor="#00000080"
-          value={mobileNo}
-          inputMode="numeric"
-          onChangeText={text => setMobileNo(text)}
-        />
-
-        <View style={{marginTop: 15}}>
-          <Button
-            color="#F5CAC3"
-            text="Save"
-            textColor="black"
-            onPress={updateProfile}
+        <View style={{marginHorizontal: 30, marginTop: 30}}>
+          <TextInput
+            style={styles.input}
+            placeholder="Enter Username"
+            placeholderTextColor="#00000080"
+            value={username}
+            onChangeText={text => setUsername(text)}
           />
+
+          <TextInput
+            editable={false}
+            style={styles.input}
+            placeholder="Enter Email"
+            placeholderTextColor="#00000080"
+            value={email}
+            inputMode="email"
+            onChangeText={text => setEmail(text)}
+          />
+          <TextInput
+            editable={false}
+            style={styles.input}
+            placeholder="Enter Mobile No"
+            placeholderTextColor="#00000080"
+            value={mobileNo}
+            inputMode="numeric"
+            onChangeText={text => setMobileNo(text)}
+          />
+
+          <View style={{marginTop: 15}}>
+            <Button
+              color="#F5CAC3"
+              text="Save"
+              textColor="black"
+              onPress={updateProfile}
+            />
+          </View>
         </View>
       </View>
-    </View>
+    </TouchableWithoutFeedback>
   );
 };
 

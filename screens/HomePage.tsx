@@ -29,6 +29,7 @@ function HomePage() {
         headerShown: false,
         tabBarActiveTintColor: '#F28482',
         tabBarInactiveTintColor: '#3D405B',
+        tabBarHideOnKeyboard: true,
         tabBarStyle: {
           height: 92,
           borderRadius: 28,

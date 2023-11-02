@@ -2,18 +2,16 @@ import React, {useState} from 'react';
 import {
   StyleSheet,
   Text,
-  TouchableOpacity,
   View,
   TextInput,
-  ToastAndroid,
+  Keyboard,
+  TouchableWithoutFeedback,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import TopBackNavigation from '../components/TopBackNavigation';
 import Button from '../components/Button';
 import {CommonActions} from '@react-navigation/native';
 import {showToast} from '../components/Toast';
-import EyeOn from '../assets/icons/EyeOn';
-import EyeOff from '../assets/icons/EyeOff';
 import PasswordInput from '../components/PasswordInput';
 
 const SignUp = ({navigation}: any) => {
@@ -22,23 +20,9 @@ const SignUp = ({navigation}: any) => {
   const [reEnteredPassword, setReEnteredPassword] = useState('');
   const [email, setEmail] = useState('');
   const [mobileNo, setmobileNo] = useState('');
-  const [isPasswordVisible, setIsPasswordVisible] = useState(false);
-  const [isRePasswordVisible, setIsRePasswordVisible] = useState(false);
 
-  const togglePasswordVisibility = () => {
-    setIsPasswordVisible(!isPasswordVisible);
-  };
-
-  const toggleRePasswordVisibility = () => {
-    setIsRePasswordVisible(!isRePasswordVisible);
-  };
-
-  const renderPasswordIcon = () => {
-    return isPasswordVisible ? <EyeOn size={20} /> : <EyeOff size={20} />;
-  };
-
-  const renderRePasswordIcon = () => {
-    return isRePasswordVisible ? <EyeOn size={20} /> : <EyeOff size={20} />;
+  const dismissKeyboard = () => {
+    Keyboard.dismiss();
   };
 
   const saveUserData = async () => {
@@ -81,64 +65,67 @@ const SignUp = ({navigation}: any) => {
   };
 
   return (
-    <View style={styles.container}>
-      <View style={{marginHorizontal: 15, marginTop: 45, position: 'absolute'}}>
-        <TopBackNavigation />
-      </View>
+    <TouchableWithoutFeedback onPress={dismissKeyboard}>
+      <View style={styles.container}>
+        <View
+          style={{marginHorizontal: 15, marginTop: 45, position: 'absolute'}}>
+          <TopBackNavigation />
+        </View>
 
-      <View style={styles.innerContainer}>
-        <Text style={styles.title}>Sign Up</Text>
+        <View style={styles.innerContainer}>
+          <Text style={styles.title}>Sign Up</Text>
 
-        <TextInput
-          style={styles.input}
-          placeholder="Enter Username"
-          placeholderTextColor="#00000080"
-          value={username}
-          onChangeText={text => setUsername(text)}
-        />
-
-        <TextInput
-          style={styles.input}
-          placeholder="Enter Email"
-          placeholderTextColor="#00000080"
-          value={email}
-          inputMode="email"
-          onChangeText={text => setEmail(text)}
-        />
-        <TextInput
-          style={styles.input}
-          placeholder="Enter Mobile No"
-          placeholderTextColor="#00000080"
-          value={mobileNo}
-          inputMode="numeric"
-          maxLength={10}
-          onChangeText={text => setmobileNo(text)}
-        />
-
-        <PasswordInput
-          value={password}
-          onChangeText={text => setPassword(text)}
-          placeholder="Enter Password"
-          secureTextEntry={true}
-        />
-
-        <PasswordInput
-          value={reEnteredPassword}
-          onChangeText={text => setReEnteredPassword(text)}
-          placeholder="Re-Enter Password"
-          secureTextEntry={true}
-        />
-
-        <View style={{marginTop: 10}}>
-          <Button
-            color="#F28482"
-            onPress={saveUserData}
-            text="Sign Up"
-            textColor="#FFF"
+          <TextInput
+            style={styles.input}
+            placeholder="Enter Username"
+            placeholderTextColor="#00000080"
+            value={username}
+            onChangeText={text => setUsername(text)}
           />
+
+          <TextInput
+            style={styles.input}
+            placeholder="Enter Email"
+            placeholderTextColor="#00000080"
+            value={email}
+            inputMode="email"
+            onChangeText={text => setEmail(text)}
+          />
+          <TextInput
+            style={styles.input}
+            placeholder="Enter Mobile No"
+            placeholderTextColor="#00000080"
+            value={mobileNo}
+            inputMode="numeric"
+            maxLength={10}
+            onChangeText={text => setmobileNo(text)}
+          />
+
+          <PasswordInput
+            value={password}
+            onChangeText={text => setPassword(text)}
+            placeholder="Enter Password"
+            secureTextEntry={true}
+          />
+
+          <PasswordInput
+            value={reEnteredPassword}
+            onChangeText={text => setReEnteredPassword(text)}
+            placeholder="Re-Enter Password"
+            secureTextEntry={true}
+          />
+
+          <View style={{marginTop: 10}}>
+            <Button
+              color="#F28482"
+              onPress={saveUserData}
+              text="Sign Up"
+              textColor="#FFF"
+            />
+          </View>
         </View>
       </View>
-    </View>
+    </TouchableWithoutFeedback>
   );
 };
 

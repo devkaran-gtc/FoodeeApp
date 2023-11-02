@@ -5,6 +5,8 @@ import {
   View,
   TextInput,
   TouchableOpacity,
+  TouchableWithoutFeedback,
+  Keyboard,
 } from 'react-native';
 
 import Button from '../components/Button';
@@ -17,6 +19,10 @@ const PaymentScreen = ({navigation}: any) => {
   const [cardNumber, setCardNumber] = useState('');
   const [cardExpiry, setCardExpiry] = useState('');
   const [cvv, setCvv] = useState('');
+
+  const dismissKeyboard = () => {
+    Keyboard.dismiss();
+  };
 
   const handleCardNumberFocus = () => {
     setIsCardNumberFocused(true);
@@ -38,7 +44,6 @@ const PaymentScreen = ({navigation}: any) => {
 
   const handleCardNumberChange = (input: any) => {
     const formattedInput = input.replace(/\D/g, '');
-
     const formattedCardNumber = formattedInput.match(/.{1,4}/g);
 
     if (formattedCardNumber) {
@@ -48,10 +53,21 @@ const PaymentScreen = ({navigation}: any) => {
     }
   };
 
-  const cardNumberWithoutSpaces = cardNumber.replace(/\s+/g, '');
-
   const handleCardExpiryChange = (text: string) => {
-    setCardExpiry(text);
+    const numericText = text.replace(/\D/g, '');
+
+    let formattedExpiry = '';
+    if (numericText.length > 0) {
+      formattedExpiry = numericText;
+      if (formattedExpiry.length > 2) {
+        formattedExpiry = `${formattedExpiry.slice(
+          0,
+          2,
+        )}/${formattedExpiry.slice(2)}`;
+      }
+    }
+
+    setCardExpiry(formattedExpiry);
   };
 
   const handleCvvChange = (text: string) => {
@@ -59,159 +75,165 @@ const PaymentScreen = ({navigation}: any) => {
   };
 
   return (
-    <View style={styles.container}>
-      <View style={styles.header}>
-        <TouchableOpacity
-          style={{
-            backgroundColor: '#F2848240',
-            justifyContent: 'center',
-            padding: 10,
-            borderRadius: 16,
-          }}
-          onPress={() => {
-            navigation.goBack();
-          }}>
-          <CloseIcon color={'#F28482'} size={24} />
-        </TouchableOpacity>
-      </View>
+    <TouchableWithoutFeedback onPress={dismissKeyboard}>
+      <View style={styles.container}>
+        <View style={styles.header}>
+          <TouchableOpacity
+            style={{
+              backgroundColor: '#F2848240',
+              justifyContent: 'center',
+              padding: 10,
+              borderRadius: 16,
+            }}
+            onPress={() => {
+              navigation.goBack();
+            }}>
+            <CloseIcon color={'#F28482'} size={24} />
+          </TouchableOpacity>
+        </View>
 
-      <View style={{flex: 1, justifyContent: 'center', marginTop: 100}}>
-        <View
-          style={{
-            backgroundColor: '#FFFFFF',
-            marginHorizontal: 30,
-            borderRadius: 26,
-          }}>
+        <View style={{flex: 1, justifyContent: 'center', marginTop: 100}}>
           <View
             style={{
-              marginHorizontal: 20,
+              backgroundColor: '#FFFFFF',
+              marginHorizontal: 30,
+              borderRadius: 26,
             }}>
-            <Text
-              style={{
-                color: '#FF785B',
-                fontSize: 17,
-                marginVertical: 16,
-                fontFamily: 'Avenir',
-                fontWeight: '300',
-              }}>
-              Card Details
-            </Text>
-
             <View
-              style={[
-                styles.inputContainer,
-                isCardNumberFocused
-                  ? {borderColor: '#FF785B'}
-                  : {borderColor: '#C4C4C4'},
-              ]}>
+              style={{
+                marginHorizontal: 20,
+              }}>
               <Text
-                style={[
-                  styles.label,
-                  isCardNumberFocused ? {color: '#FF785B'} : {color: '#C4C4C4'},
-                ]}>
-                Card Number
+                style={{
+                  color: '#FF785B',
+                  fontSize: 17,
+                  marginVertical: 16,
+                  fontFamily: 'Avenir',
+                  fontWeight: '300',
+                }}>
+                Card Details
               </Text>
-              <TextInput
-                style={[
-                  styles.textInput,
-                  isCardNumberFocused ? {color: '#FF785B'} : {color: '#C4C4C4'},
-                ]}
-                inputMode="numeric"
-                placeholder="0000 0000 0000 0000"
-                maxLength={19}
-                placeholderTextColor={
-                  isCardNumberFocused ? '#FF785B' : '#C4C4C4'
-                }
-                onFocus={handleCardNumberFocus}
-                onChangeText={handleCardNumberChange}
-                value={cardNumber}
-              />
-            </View>
 
-            <View style={{flexDirection: 'row', marginTop: 23}}>
               <View
                 style={[
                   styles.inputContainer,
-                  isCardExpiryFocused
+                  isCardNumberFocused
                     ? {borderColor: '#FF785B'}
                     : {borderColor: '#C4C4C4'},
-                  {flex: 1, marginRight: 11},
                 ]}>
                 <Text
                   style={[
                     styles.label,
-                    isCardExpiryFocused
+                    isCardNumberFocused
                       ? {color: '#FF785B'}
                       : {color: '#C4C4C4'},
                   ]}>
-                  Card Expiry
+                  Card Number
                 </Text>
                 <TextInput
                   style={[
                     styles.textInput,
-                    isCardExpiryFocused
+                    isCardNumberFocused
                       ? {color: '#FF785B'}
                       : {color: '#C4C4C4'},
                   ]}
                   inputMode="numeric"
-                  placeholder="MM/YY"
-                  maxLength={5}
+                  placeholder="0000 0000 0000 0000"
+                  maxLength={19}
                   placeholderTextColor={
-                    isCardExpiryFocused ? '#FF785B' : '#C4C4C4'
+                    isCardNumberFocused ? '#FF785B' : '#C4C4C4'
                   }
-                  onFocus={handleCardExpiryFocus}
-                  onChangeText={handleCardExpiryChange}
-                  value={cardExpiry}
+                  onFocus={handleCardNumberFocus}
+                  onChangeText={handleCardNumberChange}
+                  value={cardNumber}
                 />
               </View>
 
-              <View
-                style={[
-                  styles.inputContainer,
-                  isCvvFocused
-                    ? {borderColor: '#FF785B'}
-                    : {borderColor: '#C4C4C4'},
-                  {flex: 1, marginLeft: 11},
-                ]}>
-                <Text
+              <View style={{flexDirection: 'row', marginTop: 23}}>
+                <View
                   style={[
-                    styles.label,
-                    isCvvFocused ? {color: '#FF785B'} : {color: '#C4C4C4'},
+                    styles.inputContainer,
+                    isCardExpiryFocused
+                      ? {borderColor: '#FF785B'}
+                      : {borderColor: '#C4C4C4'},
+                    {flex: 1, marginRight: 11},
                   ]}>
-                  CVV
-                </Text>
-                <TextInput
+                  <Text
+                    style={[
+                      styles.label,
+                      isCardExpiryFocused
+                        ? {color: '#FF785B'}
+                        : {color: '#C4C4C4'},
+                    ]}>
+                    Card Expiry
+                  </Text>
+                  <TextInput
+                    style={[
+                      styles.textInput,
+                      isCardExpiryFocused
+                        ? {color: '#FF785B'}
+                        : {color: '#C4C4C4'},
+                    ]}
+                    inputMode="numeric"
+                    placeholder="MM/YY"
+                    maxLength={5}
+                    placeholderTextColor={
+                      isCardExpiryFocused ? '#FF785B' : '#C4C4C4'
+                    }
+                    onFocus={handleCardExpiryFocus}
+                    onChangeText={handleCardExpiryChange}
+                    value={cardExpiry}
+                  />
+                </View>
+
+                <View
                   style={[
-                    styles.textInput,
-                    isCvvFocused ? {color: '#FF785B'} : {color: '#C4C4C4'},
-                  ]}
-                  inputMode="numeric"
-                  placeholder="123"
-                  maxLength={3}
-                  secureTextEntry={true}
-                  placeholderTextColor={isCvvFocused ? '#FF785B' : '#C4C4C4'}
-                  onFocus={handleCvvFocus}
-                  onChangeText={handleCvvChange}
-                  value={cvv}
+                    styles.inputContainer,
+                    isCvvFocused
+                      ? {borderColor: '#FF785B'}
+                      : {borderColor: '#C4C4C4'},
+                    {flex: 1, marginLeft: 11},
+                  ]}>
+                  <Text
+                    style={[
+                      styles.label,
+                      isCvvFocused ? {color: '#FF785B'} : {color: '#C4C4C4'},
+                    ]}>
+                    CVV
+                  </Text>
+                  <TextInput
+                    style={[
+                      styles.textInput,
+                      isCvvFocused ? {color: '#FF785B'} : {color: '#C4C4C4'},
+                    ]}
+                    inputMode="numeric"
+                    placeholder="123"
+                    maxLength={3}
+                    secureTextEntry={true}
+                    placeholderTextColor={isCvvFocused ? '#FF785B' : '#C4C4C4'}
+                    onFocus={handleCvvFocus}
+                    onChangeText={handleCvvChange}
+                    value={cvv}
+                  />
+                </View>
+              </View>
+
+              <View style={{marginHorizontal: 50, marginVertical: 33}}>
+                <Button
+                  text="Pay Now"
+                  color="#F28482"
+                  onPress={() => {
+                    //   console.log(cardNumberWithoutSpaces);
+                    navigation.navigate('PaymentStatus');
+                  }}
+                  textColor="#FFFFFF"
                 />
               </View>
-            </View>
-
-            <View style={{marginHorizontal: 50, marginVertical: 33}}>
-              <Button
-                text="Pay Now"
-                color="#F28482"
-                onPress={() => {
-                  //   console.log(cardNumberWithoutSpaces);
-                  navigation.navigate('PaymentStatus');
-                }}
-                textColor="#FFFFFF"
-              />
             </View>
           </View>
         </View>
       </View>
-    </View>
+    </TouchableWithoutFeedback>
   );
 };
 

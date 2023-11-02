@@ -11,12 +11,12 @@ interface PasswordInputProps {
   secureTextEntry: boolean;
 }
 
-const PasswordInput: React.FC<PasswordInputProps> = ({
+const PasswordInput = ({
   value,
   onChangeText,
   placeholder,
   secureTextEntry,
-}) => {
+}:PasswordInputProps) => {
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
 
   const togglePasswordVisibility = () => {

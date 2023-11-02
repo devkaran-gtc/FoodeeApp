@@ -6,6 +6,8 @@ import {
   View,
   TextInput,
   Image,
+  Keyboard,
+  TouchableWithoutFeedback,
 } from 'react-native';
 import SimpleHeader from '../components/SimpleHeader';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -59,6 +61,11 @@ const AddCard = ({navigation}: any) => {
       } else {
         setFormetedCardNumber('');
       }
+
+      /* const cardNumber =formatCardNumber( formattedInput)
+     setFormetedCardNumber(cardNumber);
+ */
+
       setCardDetails({...cardDetails, [key]: cardNumberWithoutSpaces});
     } else {
       setCardDetails({...cardDetails, [key]: value});
@@ -102,144 +109,150 @@ const AddCard = ({navigation}: any) => {
     }
   };
 
+  const dismissKeyboard = () => {
+    Keyboard.dismiss();
+  };
+
   return (
-    <View style={styles.container}>
-      <SimpleHeader title="Add Credit Card" />
+    <TouchableWithoutFeedback onPress={dismissKeyboard}>
+      <View style={styles.container}>
+        <SimpleHeader title="Add Credit Card" />
 
-      <View style={styles.CardContainer}>
-        <View style={{alignItems: 'center'}}>
-          <Image
-            resizeMode="contain"
-            style={{height: 196}}
-            source={require('../assets/images/CreditCardBg.png')}
-          />
-        </View>
-
-        <View
-          style={{
-            flex: 1,
-            position: 'absolute',
-            marginHorizontal: 42,
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-          }}>
-          <View style={{flex: 1}}>
-            <Text style={styles.nameText}>{cardDetails.cardHolderName}</Text>
-            <Text style={[styles.bankText, {marginTop: 66}]}>
-              {cardDetails.bankName}
-            </Text>
-            <Text style={styles.cardNumberText}>{formetedCardNumber}</Text>
-            <Text style={styles.balanceText}>$12,999,999.99</Text>
-          </View>
-
-          <View style={{flex: 1, alignItems: 'flex-end'}}>
-            <Text style={[styles.bankText, {marginTop: 15}]}>
-              {cardDetails.bankName}
-            </Text>
+        <View style={styles.CardContainer}>
+          <View style={{alignItems: 'center'}}>
             <Image
               resizeMode="contain"
-              style={{marginTop: 123, width: 40, height: 23}}
-              source={require('../assets/images/masterCard.png')}
-            />
-          </View>
-        </View>
-
-        <View style={styles.addCardContainer}>
-          <View style={styles.inputContainer}>
-            <Text style={styles.title}>Bank Name</Text>
-            <TextInput
-              style={styles.textInput}
-              placeholder="Enter Bank name"
-              placeholderTextColor={'#00000080'}
-              onChangeText={text => handleTextInputChange('bankName', text)}
-            />
-          </View>
-          <View style={styles.inputContainer}>
-            <Text style={styles.title}>Your Name</Text>
-            <TextInput
-              style={styles.textInput}
-              placeholder="Enter Name"
-              placeholderTextColor={'#00000080'}
-              onChangeText={text =>
-                handleTextInputChange('cardHolderName', text)
-              }
-            />
-          </View>
-          <View style={styles.inputContainer}>
-            <Text style={styles.title}>Card Number</Text>
-            <TextInput
-              style={styles.textInput}
-              inputMode="numeric"
-              placeholder="Enter Card Number"
-              maxLength={19}
-              placeholderTextColor={'#00000080'}
-              onChangeText={text => handleTextInputChange('cardNumber', text)}
-              value={formetedCardNumber}
+              style={{height: 196}}
+              source={require('../assets/images/CreditCardBg.png')}
             />
           </View>
 
-          <View style={styles.inputContainer}>
-            <Text style={styles.title}>Expiry</Text>
-            <TextInput
-              style={styles.textInput}
-              placeholder="Enter Date"
-              placeholderTextColor="#00000080"
-              value={
-                isDatePicked
-                  ? date.toLocaleDateString('en-US', {
-                      month: '2-digit',
-                      year: 'numeric',
-                    })
-                  : ''
-              }
-              onChangeText={() => {}}
-            />
-            <TouchableOpacity
-              style={{
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                right: 0,
-                bottom: 0,
-              }}
-              onPress={() => {
-                showPicker(true);
-              }}
-            />
+          <View
+            style={{
+              flex: 1,
+              position: 'absolute',
+              marginHorizontal: 42,
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+            }}>
+            <View style={{flex: 1}}>
+              <Text style={styles.nameText}>{cardDetails.cardHolderName}</Text>
+              <Text style={[styles.bankText, {marginTop: 66}]}>
+                {cardDetails.bankName}
+              </Text>
+              <Text style={styles.cardNumberText}>{formetedCardNumber}</Text>
+              <Text style={styles.balanceText}>$12,999,999.99</Text>
+            </View>
+
+            <View style={{flex: 1, alignItems: 'flex-end'}}>
+              <Text style={[styles.bankText, {marginTop: 15}]}>
+                {cardDetails.bankName}
+              </Text>
+              <Image
+                resizeMode="contain"
+                style={{marginTop: 123, width: 40, height: 23}}
+                source={require('../assets/images/masterCard.png')}
+              />
+            </View>
           </View>
 
-          {show && (
-            <MonthPicker
-              onChange={onValueChange}
-              value={date}
-              minimumDate={new Date()}
-              locale="us"
-            />
-          )}
+          <View style={styles.addCardContainer}>
+            <View style={styles.inputContainer}>
+              <Text style={styles.title}>Bank Name</Text>
+              <TextInput
+                style={styles.textInput}
+                placeholder="Enter Bank name"
+                placeholderTextColor={'#00000080'}
+                onChangeText={text => handleTextInputChange('bankName', text)}
+              />
+            </View>
+            <View style={styles.inputContainer}>
+              <Text style={styles.title}>Your Name</Text>
+              <TextInput
+                style={styles.textInput}
+                placeholder="Enter Name"
+                placeholderTextColor={'#00000080'}
+                onChangeText={text =>
+                  handleTextInputChange('cardHolderName', text)
+                }
+              />
+            </View>
+            <View style={styles.inputContainer}>
+              <Text style={styles.title}>Card Number</Text>
+              <TextInput
+                style={styles.textInput}
+                inputMode="numeric"
+                placeholder="Enter Card Number"
+                maxLength={19}
+                placeholderTextColor={'#00000080'}
+                onChangeText={text => handleTextInputChange('cardNumber', text)}
+                value={formetedCardNumber}
+              />
+            </View>
 
-          <View style={styles.inputContainer}>
-            <Text style={styles.title}>CVV</Text>
-            <TextInput
-              style={styles.textInput}
-              placeholder="Enter cvv"
-              inputMode="numeric"
-              secureTextEntry
-              maxLength={3}
-              placeholderTextColor={'#00000080'}
-              onChangeText={text => handleTextInputChange('cvv', text)}
-            />
-          </View>
-          <View style={{marginTop: 109}}>
-            <Button
-              color="#F28482"
-              text="Add"
-              textColor="#FFFFFF"
-              onPress={saveCard}
-            />
+            <View style={styles.inputContainer}>
+              <Text style={styles.title}>Expiry</Text>
+              <TextInput
+                style={styles.textInput}
+                placeholder="Enter Date"
+                placeholderTextColor="#00000080"
+                value={
+                  isDatePicked
+                    ? date.toLocaleDateString('en-US', {
+                        month: '2-digit',
+                        year: 'numeric',
+                      })
+                    : ''
+                }
+                onChangeText={() => {}}
+              />
+              <TouchableOpacity
+                style={{
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                }}
+                onPress={() => {
+                  showPicker(true);
+                }}
+              />
+            </View>
+
+            {show && (
+              <MonthPicker
+                onChange={onValueChange}
+                value={date}
+                minimumDate={new Date()}
+                locale="us"
+              />
+            )}
+
+            <View style={styles.inputContainer}>
+              <Text style={styles.title}>CVV</Text>
+              <TextInput
+                style={styles.textInput}
+                placeholder="Enter cvv"
+                inputMode="numeric"
+                secureTextEntry
+                maxLength={3}
+                placeholderTextColor={'#00000080'}
+                onChangeText={text => handleTextInputChange('cvv', text)}
+              />
+            </View>
+            <View style={{marginTop: 109}}>
+              <Button
+                color="#F28482"
+                text="Add"
+                textColor="#FFFFFF"
+                onPress={saveCard}
+              />
+            </View>
           </View>
         </View>
       </View>
-    </View>
+    </TouchableWithoutFeedback>
   );
 };
 

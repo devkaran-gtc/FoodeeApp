@@ -1,51 +1,27 @@
-import React, {useEffect, useState} from 'react';
+import React, {useState} from 'react';
 import {
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
-  TextInput,
   ToastAndroid,
+  Keyboard,
+  TouchableWithoutFeedback,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import SimpleHeader from '../components/SimpleHeader';
-import EyeOn from '../assets/icons/EyeOn';
-import EyeOff from '../assets/icons/EyeOff';
 import PasswordInput from '../components/PasswordInput';
 
 const ForgotPassword = ({navigation, route}: any) => {
   const [newPass, setNewPass] = useState('');
   const [newRePass, setNewRePass] = useState('');
   const [oldPass, setOldPass] = useState('');
-  const [isNewPassVisible, setIsNewPassVisible] = useState(false);
-  const [isNewRePassVisible, setIsNewRePasswordVisible] = useState(false);
-  const [isPasswordVisible, setIsPasswordVisible] = useState(false);
-
-  const togglePasswordVisibility = () => {
-    setIsPasswordVisible(!isPasswordVisible);
-  };
-
-  const toggleNewPasswordVisibility = () => {
-    setIsNewPassVisible(!isNewPassVisible);
-  };
-
-  const toggleNewRePasswordVisibility = () => {
-    setIsNewRePasswordVisible(!isNewRePassVisible);
-  };
-
-  const renderIcon = () => {
-    return isPasswordVisible ? <EyeOn size={20} /> : <EyeOff size={20} />;
-  };
-
-  const renderPasswordIcon = () => {
-    return isNewPassVisible ? <EyeOn size={20} /> : <EyeOff size={20} />;
-  };
-
-  const renderRePasswordIcon = () => {
-    return isNewRePassVisible ? <EyeOn size={20} /> : <EyeOff size={20} />;
-  };
 
   const fromProfile = route.params?.fromProfile || false;
+
+  const dismissKeyboard = () => {
+    Keyboard.dismiss();
+  };
 
   const updatePassword = async () => {
     try {
@@ -113,42 +89,44 @@ const ForgotPassword = ({navigation, route}: any) => {
   };
 
   return (
-    <View style={styles.container}>
-      <SimpleHeader
-        title={fromProfile ? 'Change Password' : 'Forgot Password'}
-      />
-
-      <View style={styles.innerContainer}>
-        <Text style={styles.title}>Enter Old Password</Text>
-
-        <PasswordInput
-          value={oldPass}
-          onChangeText={text => setOldPass(text)}
-          placeholder="Password"
-          secureTextEntry={true}
+    <TouchableWithoutFeedback onPress={dismissKeyboard}>
+      <View style={styles.container}>
+        <SimpleHeader
+          title={fromProfile ? 'Change Password' : 'Forgot Password'}
         />
 
-        <Text style={styles.title}>Create New Password</Text>
+        <View style={styles.innerContainer}>
+          <Text style={styles.title}>Enter Old Password</Text>
 
-        <PasswordInput
-          value={newPass}
-          onChangeText={text => setNewPass(text)}
-          placeholder="Enter Password"
-          secureTextEntry={true}
-        />
+          <PasswordInput
+            value={oldPass}
+            onChangeText={text => setOldPass(text)}
+            placeholder="Password"
+            secureTextEntry={true}
+          />
 
-        <PasswordInput
-          value={newRePass}
-          onChangeText={text => setNewRePass(text)}
-          placeholder="Re-Enter Password"
-          secureTextEntry={true}
-        />
+          <Text style={styles.title}>Create New Password</Text>
 
-        <TouchableOpacity style={styles.saveBtn} onPress={updatePassword}>
-          <Text style={styles.saveText}>Save</Text>
-        </TouchableOpacity>
+          <PasswordInput
+            value={newPass}
+            onChangeText={text => setNewPass(text)}
+            placeholder="Enter Password"
+            secureTextEntry={true}
+          />
+
+          <PasswordInput
+            value={newRePass}
+            onChangeText={text => setNewRePass(text)}
+            placeholder="Re-Enter Password"
+            secureTextEntry={true}
+          />
+
+          <TouchableOpacity style={styles.saveBtn} onPress={updatePassword}>
+            <Text style={styles.saveText}>Save</Text>
+          </TouchableOpacity>
+        </View>
       </View>
-    </View>
+    </TouchableWithoutFeedback>
   );
 };
 

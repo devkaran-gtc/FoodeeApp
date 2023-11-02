@@ -6,6 +6,8 @@ import {
   TextInput,
   Pressable,
   TouchableOpacity,
+  Keyboard,
+  TouchableWithoutFeedback,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import TopBackNavigation from '../components/TopBackNavigation';
@@ -17,6 +19,10 @@ import PasswordInput from '../components/PasswordInput';
 const SignIn = ({navigation}: any) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+
+  const dismissKeyboard = () => {
+    Keyboard.dismiss();
+  };
 
   const checkSignIn = async () => {
     try {
@@ -60,45 +66,48 @@ const SignIn = ({navigation}: any) => {
   };
 
   return (
-    <View style={styles.container}>
-      <View style={{marginHorizontal: 15, marginTop: 45, position: 'absolute'}}>
-        <TopBackNavigation />
-      </View>
-      <View style={styles.innerContainer}>
-        <Text style={styles.title}>Sign In</Text>
-
-        <TextInput
-          style={styles.input}
-          placeholder="Username"
-          placeholderTextColor="#00000080"
-          value={username}
-          onChangeText={text => setUsername(text)}
-        />
-        
-        <PasswordInput
-          value={password}
-          onChangeText={text => setPassword(text)}
-          placeholder="Enter Password"
-          secureTextEntry={true}
-        />
-
-        <View style={{marginTop: 10}}>
-          <Button
-            color="#F28482"
-            onPress={checkSignIn}
-            text="Sign In"
-            textColor="#fff"
-          />
+    <TouchableWithoutFeedback onPress={dismissKeyboard}>
+      <View style={styles.container}>
+        <View
+          style={{marginHorizontal: 15, marginTop: 45, position: 'absolute'}}>
+          <TopBackNavigation />
         </View>
+        <View style={styles.innerContainer}>
+          <Text style={styles.title}>Sign In</Text>
 
-        <Pressable
-          onPress={() => {
-            navigation.navigate('ForgotPassword');
-          }}>
-          <Text style={styles.forgotPass}>Forgot Password?</Text>
-        </Pressable>
+          <TextInput
+            style={styles.input}
+            placeholder="Username"
+            placeholderTextColor="#00000080"
+            value={username}
+            onChangeText={text => setUsername(text)}
+          />
+
+          <PasswordInput
+            value={password}
+            onChangeText={text => setPassword(text)}
+            placeholder="Enter Password"
+            secureTextEntry={true}
+          />
+
+          <View style={{marginTop: 10}}>
+            <Button
+              color="#F28482"
+              onPress={checkSignIn}
+              text="Sign In"
+              textColor="#fff"
+            />
+          </View>
+
+          <Pressable
+            onPress={() => {
+              navigation.navigate('ForgotPassword');
+            }}>
+            <Text style={styles.forgotPass}>Forgot Password?</Text>
+          </Pressable>
+        </View>
       </View>
-    </View>
+    </TouchableWithoutFeedback>
   );
 };
 
