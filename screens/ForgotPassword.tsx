@@ -11,6 +11,7 @@ import {
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import SimpleHeader from '../components/SimpleHeader';
 import PasswordInput from '../components/PasswordInput';
+import {showToast} from '../components/Toast';
 
 const ForgotPassword = ({navigation, route}: any) => {
   const [newPass, setNewPass] = useState('');
@@ -30,57 +31,34 @@ const ForgotPassword = ({navigation, route}: any) => {
       if (userDataJSON) {
         const userData = JSON.parse(userDataJSON);
         if (!newPass || !newRePass || !oldPass) {
-          ToastAndroid.showWithGravityAndOffset(
-            'Fields are empty',
-            ToastAndroid.SHORT,
-            ToastAndroid.BOTTOM,
-            25,
-            50,
-          );
+          showToast('Fields are empty');
         } else if (userData.password === oldPass) {
           if (newPass === newRePass) {
-            const updatedUserData = {
-              ...userData,
-              password: newPass,
-            };
+            if (newPass != oldPass) {
+              const updatedUserData = {
+                ...userData,
+                password: newPass,
+              };
 
-            const updatedUserDataJSON = JSON.stringify(updatedUserData);
+              const updatedUserDataJSON = JSON.stringify(updatedUserData);
 
-            await AsyncStorage.setItem('userData', updatedUserDataJSON);
+              await AsyncStorage.setItem('userData', updatedUserDataJSON);
 
-            console.log('Password updated successfully.');
-            ToastAndroid.showWithGravityAndOffset(
-              'Password updated successfully.',
-              ToastAndroid.SHORT,
-              ToastAndroid.BOTTOM,
-              25,
-              50,
-            );
+              showToast('Password updated successfully');
 
-            if (fromProfile) {
-              navigation.goBack();
+              if (fromProfile) {
+                navigation.goBack();
+              } else {
+                navigation.navigate('SignInScreen');
+              }
             } else {
-              navigation.navigate('SignInScreen');
+              showToast('old and new password should not be same ');
             }
           } else {
-            ToastAndroid.showWithGravityAndOffset(
-              'new password should be same',
-              ToastAndroid.SHORT,
-              ToastAndroid.BOTTOM,
-              25,
-              50,
-            );
-            console.log('new password should be same');
+            showToast('new password should be same');
           }
         } else {
-          ToastAndroid.showWithGravityAndOffset(
-            'Old password is incorrect',
-            ToastAndroid.SHORT,
-            ToastAndroid.BOTTOM,
-            25,
-            50,
-          );
-          console.log('Old password is incorrect');
+          showToast('Old password is incorrect');
         }
       }
     } catch (error) {

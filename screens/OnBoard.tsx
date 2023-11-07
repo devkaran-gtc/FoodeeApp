@@ -62,7 +62,6 @@ const OnBoard = ({navigation}: any) => {
     if (flatListRef.current) {
       const offset = index * width;
       flatListRef.current.scrollToOffset({animated: true, offset});
-      setActiveSlide(index);
     }
   };
 
