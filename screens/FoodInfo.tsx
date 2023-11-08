@@ -1,24 +1,62 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import {Text, StyleSheet, View, Image} from 'react-native';
 import FoodTag from '../components/FoodTag';
 import CartTab from '../components/CartTab';
 import Header from '../components/Header';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import {connect} from 'react-redux';
+import {
+  addToCart,
+  incrementCartItem,
+  decrementCartItem,
+} from '../components/redux/Action';
 
-const FoodInfo = ({route, navigation}: any) => {
+const mapStateToProps = (state: any) => ({
+  cartItems: state.cart.cartItems,
+});
+
+const mapDispatchToProps = {
+  addToCart,
+  incrementCartItem,
+  decrementCartItem,
+};
+
+const FoodInfo = ({
+  route,
+  navigation,
+  addToCart,
+  cartItems,
+  incrementCartItem,
+  decrementCartItem,
+}: any) => {
   const [counter, setCounter] = React.useState(1);
   const [totalPrice, setTotalPrice] = React.useState(route.params.price);
 
   const handleIncrement = () => {
     setCounter(counter + 1);
     setTotalPrice(totalPrice + route.params.price);
+    incrementCartItem(route.params.id);
   };
 
   const handleDecrement = () => {
     if (counter > 1) {
       setCounter(counter - 1);
       setTotalPrice(totalPrice - route.params.price);
+      decrementCartItem(route.params.id);
     }
+  };
+
+  const handleAddToCart = () => {
+    const cartItem = {
+      id: Math.floor(Math.random() * 9000 + 1000),
+      name: route.params.name,
+      itemCount: counter,
+      price: totalPrice,
+      basePrice: route.params.price,
+      imgUrl: route.params.imgUrl,
+    };
+
+    addToCart(cartItem);
+    navigation.navigate('Cart');
   };
 
   return (
@@ -104,45 +142,7 @@ const FoodInfo = ({route, navigation}: any) => {
           onIncrement={handleIncrement}
           onDecrement={handleDecrement}
           totalPrice={totalPrice}
-          cartBtnOnPress={() => {
-            const cartItem = {
-              counter: route.params.counter,
-              name: route.params.name,
-              itemCount: counter,
-              price: totalPrice,
-              basePrice: route.params.price,
-              imgUrl: route.params.imgUrl,
-            };
-
-            AsyncStorage.getItem('cartItems')
-              .then(existingCartItemsJson => {
-                let existingCartItems = [];
-
-                if (existingCartItemsJson) {
-                  existingCartItems = JSON.parse(existingCartItemsJson);
-                }
-
-                existingCartItems.push(cartItem);
-
-                return AsyncStorage.setItem(
-                  'cartItems',
-                  JSON.stringify(existingCartItems),
-                );
-              })
-              .then(() => {
-                navigation.navigate('Cart', {
-                  counter: route.params.counter,
-                  name: route.params.name,
-                  itemCount: counter,
-                  price: totalPrice,
-                  basePrice: route.params.price,
-                  imgUrl: route.params.imgUrl,
-                });
-              })
-              .catch(error => {
-                console.error('Error storing item in cart:', error);
-              });
-          }}
+          cartBtnOnPress={handleAddToCart}
         />
       </View>
     </View>
@@ -219,4 +219,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default FoodInfo;
+export default connect(mapStateToProps, mapDispatchToProps)(FoodInfo);

@@ -23,6 +23,8 @@ import Notification from './screens/Notification';
 import ContactUs from './screens/ContactUs';
 import AboutUs from './screens/AboutUs';
 import {enableLatestRenderer} from 'react-native-maps';
+import { Provider } from 'react-redux';
+import store from './components/redux/Store';
 
 export type RootStackParam = {
   FirstScreen: any;
@@ -92,40 +94,45 @@ function App() {
   }
 
   return (
-    <NavigationContainer>
-      <StatusBar
-        backgroundColor={'transparent'}
-        translucent={true}
-        barStyle={'dark-content'}
-      />
-      <RootStack.Navigator
-        initialRouteName={initialRoute}
-        screenOptions={{
-          headerShown: false,
-        }}>
-        <RootStack.Screen name="OnBoard" component={OnBoard} />
-        <RootStack.Screen name="FirstScreen" component={First} />
-        <RootStack.Screen name="SignUpScreen" component={SignUp} />
-        <RootStack.Screen name="SignInScreen" component={SignIn} />
-        <RootStack.Screen name="HomePageScreen" component={HomePage} />
-        <RootStack.Screen name="FoodInfo" component={FoodInfo} />
-        <RootStack.Screen name="Cart" component={Cart} />
-        <RootStack.Screen name="ForgotPassword" component={ForgotPassword} />
-        <RootStack.Screen name="PaymentSettings" component={PaymentSettings} />
-        <RootStack.Screen name="AddCard" component={AddCard} />
-        <RootStack.Screen name="MyProfile" component={MyProfile} />
-        <RootStack.Screen name="MyVoucher" component={MyVoucher} />
-        <RootStack.Screen
-          name="ManagePaymentMethod"
-          component={ManagePaymentMethod}
+    <Provider store={store}>
+      <NavigationContainer>
+        <StatusBar
+          backgroundColor={'transparent'}
+          translucent={true}
+          barStyle={'dark-content'}
         />
-        <RootStack.Screen name="PaymentScreen" component={PaymentScreen} />
-        <RootStack.Screen name="PaymentStatus" component={PaymentStatus} />
-        <RootStack.Screen name="Notification" component={Notification} />
-        <RootStack.Screen name="ContactUs" component={ContactUs} />
-        <RootStack.Screen name="AboutUs" component={AboutUs} />
-      </RootStack.Navigator>
-    </NavigationContainer>
+        <RootStack.Navigator
+          initialRouteName={initialRoute}
+          screenOptions={{
+            headerShown: false,
+          }}>
+          <RootStack.Screen name="OnBoard" component={OnBoard} />
+          <RootStack.Screen name="FirstScreen" component={First} />
+          <RootStack.Screen name="SignUpScreen" component={SignUp} />
+          <RootStack.Screen name="SignInScreen" component={SignIn} />
+          <RootStack.Screen name="HomePageScreen" component={HomePage} />
+          <RootStack.Screen name="FoodInfo" component={FoodInfo} />
+          <RootStack.Screen name="Cart" component={Cart} />
+          <RootStack.Screen name="ForgotPassword" component={ForgotPassword} />
+          <RootStack.Screen
+            name="PaymentSettings"
+            component={PaymentSettings}
+          />
+          <RootStack.Screen name="AddCard" component={AddCard} />
+          <RootStack.Screen name="MyProfile" component={MyProfile} />
+          <RootStack.Screen name="MyVoucher" component={MyVoucher} />
+          <RootStack.Screen
+            name="ManagePaymentMethod"
+            component={ManagePaymentMethod}
+          />
+          <RootStack.Screen name="PaymentScreen" component={PaymentScreen} />
+          <RootStack.Screen name="PaymentStatus" component={PaymentStatus} />
+          <RootStack.Screen name="Notification" component={Notification} />
+          <RootStack.Screen name="ContactUs" component={ContactUs} />
+          <RootStack.Screen name="AboutUs" component={AboutUs} />
+        </RootStack.Navigator>
+      </NavigationContainer>
+    </Provider>
   );
 }
 

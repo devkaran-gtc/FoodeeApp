@@ -7,28 +7,30 @@ import {
   FlatList,
   Alert,
   ScrollView,
-  TextInput,
-  NativeSyntheticEvent,
-  TextInputFocusEventData,
 } from 'react-native';
 import Header from '../components/Header';
 import CartItem from '../components/CartItem';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import CartTab from '../components/CartTab';
 import FoodItem from '../components/FoodItem';
+import {addToCart, clearCart, removeFromCart} from '../components/redux/Action';
+import {connect} from 'react-redux';
 
-interface CartItem {
-  itemCount: number;
-  imgUrl: string;
-  name: string;
-  price: number;
-  basePrice: number;
-}
+const mapStateToProps = (state: any) => ({
+  cartItems: state.cart.cartItems,
+});
 
-const Cart = ({navigation}: any) => {
+const mapDispatchToProps = {
+  removeFromCart,
+  clearCart,
+};
+
+const Cart = ({navigation, cartItems, removeFromCart, clearCart}: any) => {
   const [currentStep, setCurrentStep] = useState('myOrder');
-  const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [grandTotal, setGrandTotal] = useState(0);
+  
+  useEffect(() => {
+    calculateGrandTotal(cartItems);
+  }, []);
 
   const [dfta, setdfta] = useState([
     {
@@ -63,20 +65,6 @@ const Cart = ({navigation}: any) => {
     },
   ]);
 
-  useEffect(() => {
-    AsyncStorage.getItem('cartItems')
-      .then(cartItemsJson => {
-        if (cartItemsJson) {
-          const parsedCartItems = JSON.parse(cartItemsJson);
-          setCartItems(parsedCartItems);
-          calculateGrandTotal(parsedCartItems);
-        }
-      })
-      .catch(error => {
-        console.error('Error loading cart items:', error);
-      });
-  }, []);
-
   const calculateGrandTotal = (items: any) => {
     let total = 0;
     for (const item of items) {
@@ -97,11 +85,7 @@ const Cart = ({navigation}: any) => {
         {
           text: 'Remove',
           onPress: () => {
-            const updatedCartItems = [...cartItems];
-            updatedCartItems.splice(itemIndex, 1);
-            setCartItems(updatedCartItems);
-            updateStorage(updatedCartItems);
-            calculateGrandTotal(updatedCartItems);
+            removeFromCart(itemIndex);
           },
         },
       ],
@@ -121,8 +105,7 @@ const Cart = ({navigation}: any) => {
         {
           text: 'Clear All',
           onPress: () => {
-            setCartItems([]);
-            updateStorage([]);
+            clearCart();
             calculateGrandTotal([]);
           },
         },
@@ -133,30 +116,29 @@ const Cart = ({navigation}: any) => {
 
   const handleIncrement = (itemIndex: number) => {
     const updatedCartItems = [...cartItems];
-    updatedCartItems[itemIndex].itemCount += 1;
-    updatedCartItems[itemIndex].price += updatedCartItems[itemIndex].basePrice;
-    setCartItems(updatedCartItems);
-    updateStorage(updatedCartItems);
-    calculateGrandTotal(updatedCartItems);
+    const cartItem = updatedCartItems.find(
+      (item: any) => item.id === itemIndex,
+    );
+
+    if (cartItem) {
+      cartItem.itemCount = (cartItem.itemCount || 0) + 1;
+      cartItem.price += cartItem.basePrice;
+
+      addToCart(updatedCartItems);
+      calculateGrandTotal(updatedCartItems);
+    }
   };
 
   const handleDecrement = (itemIndex: number) => {
     const updatedCartItems = [...cartItems];
-    if (updatedCartItems[itemIndex].itemCount > 1) {
-      updatedCartItems[itemIndex].itemCount -= 1;
-      updatedCartItems[itemIndex].price -=
-        updatedCartItems[itemIndex].basePrice;
-    }
-    setCartItems(updatedCartItems);
-    updateStorage(updatedCartItems);
-    calculateGrandTotal(updatedCartItems);
-  };
+    const cartItem = updatedCartItems.find(item => item.id === itemIndex);
 
-  const updateStorage = async (updatedCartItems: any) => {
-    try {
-      await AsyncStorage.setItem('cartItems', JSON.stringify(updatedCartItems));
-    } catch (error) {
-      console.error('Error updating cart items in storage:', error);
+    if (cartItem && cartItem.itemCount > 1) {
+      cartItem.itemCount -= 1;
+      cartItem.price -= cartItem.basePrice;
+
+      addToCart(updatedCartItems);
+      calculateGrandTotal(updatedCartItems);
     }
   };
 
@@ -273,18 +255,17 @@ const Cart = ({navigation}: any) => {
           <ScrollView
             showsVerticalScrollIndicator={false}
             contentContainerStyle={{paddingBottom: 104}}>
-
-            {cartItems.map((item, index) => (
+            {cartItems.map((item: any) => (
               <CartItem
-                key={index.toString()}
+                key={item.id}
                 counter={item.itemCount}
                 imgUrl={item.imgUrl}
-                name={item.name}
-                onDecrement={() => handleDecrement(index)}
-                onIncrement={() => handleIncrement(index)}
+                name={item?.name}
+                onDecrement={() => handleDecrement(item.id)}
+                onIncrement={() => handleIncrement(item.id)}
                 price={item.price}
                 onLongPress={() => {
-                  onDelete(index);
+                  onDelete(item.id);
                 }}
               />
             ))}
@@ -463,4 +444,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default Cart;
+export default connect(mapStateToProps, mapDispatchToProps)(Cart);
